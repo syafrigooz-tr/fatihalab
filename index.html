@@ -10,15 +10,13 @@
   #info, #score, #winner { font-size: 18px; margin-top: 10px; }
   button { padding: 10px 20px; font-size: 18px; margin-top: 15px; cursor: pointer; display: inline-block; }
   #jumpBtn { 
-    padding: 20px 40px; 
-    font-size: 24px; 
+    padding: 15px 40px; 
+    font-size: 22px; 
     background: #28a745; 
     color: white; 
     border: none; 
-    border-radius: 15px; 
-    margin: 10px;
-    width: 150px;
-    height: 80px;
+    border-radius: 10px; 
+    margin-top: 10px;
   }
   #restartBtn, #nextTurnBtn { display: none; }
 </style>
@@ -28,13 +26,16 @@
 <p>Tekan <b>Spasi</b> atau tombol <b>Lompat</b> untuk lompat.</p>
 
 <button id="startBtn">Mulai Game</button>
-<button id="jumpBtn">Lompat</button>
 <button id="nextTurnBtn">Giliran Abang Alab</button>
 <button id="restartBtn">Main Lagi</button>
 
 <canvas id="gameCanvas" width="600" height="200"></canvas>
 <div id="info"></div>
 <div id="score"></div>
+
+<!-- Tombol lompat berada di bawah skor -->
+<button id="jumpBtn">Lompat</button>
+
 <div id="winner"></div>
 
 <script>
@@ -151,7 +152,7 @@ function startTurn(){
   update();
 }
 
-// Tombol lompat untuk touch dan klik
+// Tombol lompat berada di bawah
 document.getElementById("jumpBtn").addEventListener("click", ()=>{
   if(player.grounded && gameRunning){
     player.vy = player.jump;
