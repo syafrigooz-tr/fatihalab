@@ -30,6 +30,8 @@ const ctx = canvas.getContext("2d");
 // gambar pohon sawit dari URL
 const palmImg = new Image();
 palmImg.src = "https://upload.wikimedia.org/wikipedia/commons/3/34/Palmeira_2.png"; // gratis dan aman
+let palmLoaded = false;
+palmImg.onload = () => { palmLoaded = true; };
 
 let player = { x: 50, y: 150, size: 30, vy: 0, gravity: 1, jump: -15, grounded: true };
 let obstacles = [];
@@ -62,8 +64,8 @@ function generateObstacles() {
   let position = 300;
   while (position < finishLine) {
     let type = Math.random() < 0.5 ? 1 : 2;
-    let height = type === 1 ? Math.floor(Math.random()*21)+20 : Math.floor(Math.random()*30)+41;
-    obs.push({ x: position, y: 180 - height, width: 40, height: height }); // width lebih lebar supaya proporsional
+    let height = type === 1 ? Math.floor(Math.random()*21)+40 : Math.floor(Math.random()*30)+60;
+    obs.push({ x: position, y: 180 - height, width: 40, height: height }); // proporsional
     let gap = Math.floor(Math.random()*201)+200; // jarak 200-400 px
     position += gap;
   }
@@ -77,6 +79,7 @@ function drawPlayer() {
 
 // gambar rintangan pohon sawit
 function drawObstacles(offset) {
+  if(!palmLoaded) return; // tunggu gambar termuat
   obstacles.forEach(o => {
     ctx.drawImage(palmImg, o.x - offset, o.y, o.width, o.height);
   });
