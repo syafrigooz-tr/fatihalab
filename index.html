@@ -55,7 +55,7 @@
     let obstacles = [];
     let score = 0;
     let distance = 0;
-    let finishLine = 15000; // 🔹 panjang lintasan diperpanjang 3x
+    let finishLine = 15000;
     let obstacleSpeed = 3;
     let gameOver = false;
     let currentPlayer = 1; // 1 = Fatih, 2 = Alab
@@ -78,14 +78,28 @@
       startTime = null;
     }
 
-    // 🔹 Fungsi generateObstacles terbaru dengan tinggi dan jarak bervariasi
+    // 🔹 Fungsi generateObstacles terbaru
     function generateObstacles() {
       let obs = [];
-      let position = 300; // posisi awal
+      let position = 300;
+      let maxHeightNormal = 70;   // tinggi rintangan normal
+      let absoluteMaxHeight = 100; // tinggi rintangan tertinggi
+      let maxAdded = false;        // penanda apakah rintangan tertinggi sudah ditempatkan
+
       while (position < finishLine) {
-        let height = Math.floor(Math.random() * 51) + 20; // tinggi 20-70 px
+        let height;
+
+        if (!maxAdded && position >= finishLine - 5000) {
+          // 🔹 rintangan tertinggi hanya muncul di 5000 terakhir
+          height = absoluteMaxHeight;
+          maxAdded = true;
+        } else {
+          height = Math.floor(Math.random() * (maxHeightNormal - 20 + 1)) + 20; // 20-70 px
+        }
+
         obs.push({ x: position, y: 180 - height, width: 20, height: height });
-        let gap = Math.floor(Math.random() * 201) + 200; // jarak antar 200-400 px
+
+        let gap = Math.floor(Math.random() * 201) + 200; // jarak antar rintangan 200-400 px
         position += gap;
       }
       return obs;
@@ -115,7 +129,6 @@
 
       if (!startTime) startTime = Date.now();
 
-      // Update player
       player.y += player.vy;
       player.vy += player.gravity;
       if (player.y >= 150) {
@@ -124,13 +137,11 @@
         player.grounded = true;
       }
 
-      // Update jarak (semakin dekat finish → makin cepat)
       distance += obstacleSpeed;
       if (distance > finishLine - 400) {
-        obstacleSpeed = 6; // percepat menjelang finish
+        obstacleSpeed = 6;
       }
 
-      // Cek finish
       if (distance >= finishLine) {
         let timeTaken = (Date.now() - startTime) / 1000;
         gameOver = true;
@@ -141,7 +152,6 @@
         return;
       }
 
-      // Cek tabrakan
       for (let o of obstacles) {
         if (
           player.x < o.x - distance + o.width &&
@@ -156,7 +166,6 @@
         }
       }
 
-      // Draw
       drawPlayer();
       drawObstacles(distance);
       drawFinishLine(distance);
@@ -173,7 +182,6 @@
           (finished ? "(Finish dalam " + times[1] + " dtk)" : "(Jarak: " + scores[1] + ")");
         document.getElementById("nextTurnBtn").style.display = "inline-block";
       } else {
-        // Tentukan pemenang
         let winnerText = "";
         if (scores[1] >= finishLine && scores[2] >= finishLine) {
           winnerText = times[1] < times[2] ? "🎉 Pemenang: Abang Fatih (lebih cepat)!" : 
