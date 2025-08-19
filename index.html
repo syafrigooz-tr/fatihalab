@@ -52,13 +52,12 @@ function resetGame() {
   startTime = null;
 }
 
-// buat rintangan pohon sawit tinggi acak
 function generateObstacles() {
   let obs = [];
   let pos = 300;
   while(pos < finishLine){
     let h = Math.floor(Math.random()*60)+60; // tinggi 60-120 px
-    obs.push({x: pos, y: 180-h, width: 30, height: h});
+    obs.push({x: pos, y: 180-h, width: 20, height: h});
     pos += Math.floor(Math.random()*201)+150;
   }
   return obs;
@@ -69,9 +68,16 @@ function drawPlayer() {
   ctx.fillRect(player.x, player.y, player.size, player.size);
 }
 
+// gambar sawit: daun kecil di atas, batang panjang ke bawah
 function drawObstacles(offset){
   obstacles.forEach(o=>{
-    ctx.drawImage(palmImg, o.x-offset, o.y, o.width, o.height);
+    let drawWidth = o.width;
+    let drawHeight = o.height;
+    let drawX = o.x - offset;
+    let drawY = o.y;
+
+    // gambar batang + daun
+    ctx.drawImage(palmImg, drawX, drawY, drawWidth, drawHeight);
   });
 }
 
@@ -101,9 +107,15 @@ function update(){
     return;
   }
 
-  // check tumbukan
+  // check tumbukan batang saja
   for(let o of obstacles){
-    if(player.x+player.size>o.x-distance && player.x<o.x-distance+o.width && player.y+player.size>o.y){
+    let hitX = o.x - distance;
+    let hitWidth = o.width;
+    let hitY = o.y + o.height*0.2;  // batang mulai sedikit di bawah daun
+    let hitHeight = o.height*0.8;   // batang lebih panjang ke bawah
+
+    if(player.x + player.size > hitX && player.x < hitX + hitWidth &&
+       player.y + player.size > hitY){
       gameOver=true; gameRunning=false;
       scores[currentPlayer]=distance;
       nextTurn(false);
