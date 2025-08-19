@@ -29,9 +29,9 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
-// 🔹 Gambar pohon aman dari Pixabay (CORS friendly)
+// 🔹 Gambar pohon aman dan CORS-friendly dari Pixabay
 const palmImg = new Image();
-palmImg.src = "https://cdn.pixabay.com/photo/2016/03/31/19/59/palm-tree-1299428_1280.png";
+palmImg.src = "https://cdn.pixabay.com/photo/2013/07/12/15/42/palm-tree-152148_1280.png";
 
 let player = {x:50,y:150,size:30,vy:0,gravity:1,jump:-15,grounded:true};
 let obstacles=[], distance=0, finishLine=2000, obstacleSpeed=3;
