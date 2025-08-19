@@ -25,7 +25,7 @@
 <h1>🏃 Game Abang Fatih vs Abang Alab 🏃</h1>
 <p>Tekan <b>Spasi</b> atau tombol <b>Lompat</b> untuk lompat.</p>
 
-<button id="startBtn">Mulai Game</button>
+<button id="startBtn" disabled>Mulai Game</button>
 <button id="nextTurnBtn">Giliran Abang Alab</button>
 <button id="restartBtn">Main Lagi</button>
 
@@ -52,13 +52,24 @@ let times = {1:null,2:null};
 let gameRunning = false;
 let startTime;
 
-// Gambar player langsung (direct image link)
+// Gambar player (gunakan URL file PNG)
 const playerImages = [
   new Image(),
   new Image()
 ];
 playerImages[0].src = 'https://i.ibb.co/fD0G2YQ/cartoon-boy-blue.png'; // Abang Fatih
 playerImages[1].src = 'https://i.ibb.co/x1T3FhS/cartoon-boy-green.png'; // Abang Alab
+
+// Tunggu gambar load sebelum game bisa dimulai
+let imagesLoaded = 0;
+playerImages.forEach(img => {
+  img.onload = () => {
+    imagesLoaded++;
+    if(imagesLoaded === playerImages.length){
+      document.getElementById("startBtn").disabled = false;
+    }
+  }
+});
 
 function resetGame(){
   player.y = 150; player.vy=0; player.grounded=true;
