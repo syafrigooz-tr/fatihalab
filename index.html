@@ -1,191 +1,195 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Game Abang Fatih vs Abang Alab</title>
-<style>
-  body { font-family: Arial, sans-serif; text-align: center; margin: 0; padding: 20px; background: #f0f0f0; }
-  canvas { border: 2px solid #333; display: block; margin: 20px auto; background: white; }
-  #info, #score, #winner { font-size: 18px; margin-top: 10px; }
-  button { padding: 10px 20px; font-size: 18px; margin-top: 15px; cursor: pointer; display: inline-block; }
-  #jumpBtn { 
-    padding: 15px 40px; 
-    font-size: 22px; 
-    background: #28a745; 
-    color: white; 
-    border: none; 
-    border-radius: 10px; 
-    margin-top: 10px;
-  }
-  #restartBtn, #nextTurnBtn { display: none; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Game Abang Fatih vs Abang Alab</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; margin: 0; padding: 20px; background: #f0f0f0; }
+    canvas { border: 2px solid #333; display: block; margin: 20px auto; background: white; }
+    #info, #score, #winner { font-size: 18px; margin-top: 10px; }
+    button { padding: 10px 20px; font-size: 18px; margin-top: 15px; cursor: pointer; display: inline-block; }
+    #jumpBtn { 
+      padding: 15px 40px; 
+      font-size: 22px; 
+      background: #28a745; 
+      color: white; 
+      border: none; 
+      border-radius: 10px; 
+      margin-top: 10px;
+    }
+    #restartBtn, #nextTurnBtn { display: none; }
+  </style>
 </head>
 <body>
-<h1>🏃 Game Abang Fatih vs Abang Alab 🏃</h1>
-<p>Tekan <b>Spasi</b> atau tombol <b>Lompat</b> untuk lompat.</p>
+  <h1>🏃 Game Abang Fatih vs Abang Alab 🏃</h1>
+  <p>Tekan <b>Spasi</b> atau tombol <b>Lompat</b> untuk lompat.</p>
 
-<button id="startBtn">Mulai Game</button>
-<button id="nextTurnBtn">Giliran Abang Alab</button>
-<button id="restartBtn">Main Lagi</button>
+  <button id="startBtn">Mulai Game</button>
+  <button id="nextTurnBtn">Giliran Abang Alab</button>
+  <button id="restartBtn">Main Lagi</button>
 
-<canvas id="gameCanvas" width="600" height="200"></canvas>
-<div id="info"></div>
-<div id="score"></div>
+  <canvas id="gameCanvas" width="600" height="200"></canvas>
+  <div id="info"></div>
+  <div id="score"></div>
 
-<!-- Tombol lompat berada di bawah skor -->
-<button id="jumpBtn">Lompat</button>
+  <!-- Tombol lompat berada di bawah skor -->
+  <button id="jumpBtn">Lompat</button>
 
-<div id="winner"></div>
+  <div id="winner"></div>
 
-<script>
-const canvas = document.getElementById("gameCanvas");
-const ctx = canvas.getContext("2d");
+  <script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
 
-let player = { x: 50, y: 150, size: 30, vy: 0, gravity: 1, jump: -15, grounded: true };
-let obstacles = [];
-let distance = 0;
-let finishLine = 15000;
-let obstacleSpeed = 3;
-let gameOver = false;
-let currentPlayer = 1;
-let scores = {1:0,2:0};
-let times = {1:null,2:null};
-let gameRunning = false;
-let startTime;
+    let player = { x: 50, y: 150, size: 30, vy: 0, gravity: 1, jump: -15, grounded: true };
+    let obstacles = [];
+    let distance = 0;
+    let finishLine = 15000;
+    let obstacleSpeed = 3;
+    let gameOver = false;
+    let currentPlayer = 1;
+    let scores = {1:0,2:0};
+    let times = {1:null,2:null};
+    let gameRunning = false;
+    let startTime;
 
-function resetGame(){
-  player.y = 150; player.vy=0; player.grounded=true;
-  obstacles = generateObstacles();
-  distance=0; gameOver=false; obstacleSpeed=3;
-  document.getElementById("score").textContent = "Jarak: 0 / " + finishLine;
-  document.getElementById("winner").textContent = "";
-  startTime = null;
-}
+    const playerImages = [
+      new Image(),
+      new Image()
+    ];
+    playerImages[0].src = 'https://id.pngtree.com/freepng/a-cartoon-character-from-the-game-baby_16715797.html';
+    playerImages[1].src = 'https://id.lovepik.com/image-450060883/cartoon-character-image-of-a-gaming-boy.html';
 
-function generateObstacles(){
-  let obs=[]; let pos=300;
-  while(pos<finishLine){
-    let height = Math.floor(Math.random()*51)+20;
-    obs.push({x:pos,y:180-height,width:20,height:height});
-    pos += Math.floor(Math.random()*201)+200;
-  }
-  return obs;
-}
-
-function drawPlayer(){
-  ctx.fillStyle = currentPlayer===1?"blue":"green";
-  ctx.fillRect(player.x,player.y,player.size,player.size);
-}
-
-function drawObstacles(offset){
-  ctx.fillStyle="red";
-  obstacles.forEach(o=> ctx.fillRect(o.x-offset,o.y,o.width,o.height));
-}
-
-function drawFinishLine(offset){
-  ctx.fillStyle="black";
-  ctx.fillRect(finishLine-offset,0,5,canvas.height);
-}
-
-function update(){
-  if(!gameRunning || gameOver) return;
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  if(!startTime) startTime=Date.now();
-
-  player.y += player.vy;
-  player.vy += player.gravity;
-  if(player.y>=150){ player.y=150; player.vy=0; player.grounded=true; }
-
-  distance += obstacleSpeed;
-  if(distance>finishLine-400) obstacleSpeed=6;
-
-  if(distance>=finishLine){
-    let timeTaken=(Date.now()-startTime)/1000;
-    gameOver=true; gameRunning=false;
-    scores[currentPlayer]=finishLine;
-    times[currentPlayer]=timeTaken;
-    nextTurn(true);
-    return;
-  }
-
-  for(let o of obstacles){
-    if(player.x < o.x-distance+o.width && player.x+player.size > o.x-distance && player.y+player.size > o.y){
-      gameOver=true; gameRunning=false;
-      scores[currentPlayer]=distance;
-      nextTurn(false);
-      return;
+    function resetGame(){
+      player.y = 150; player.vy=0; player.grounded=true;
+      obstacles = generateObstacles();
+      distance=0; gameOver=false; obstacleSpeed=3;
+      document.getElementById("score").textContent = "Jarak: 0 / " + finishLine;
+      document.getElementById("winner").textContent = "";
+      startTime = null;
     }
-  }
 
-  drawPlayer();
-  drawObstacles(distance);
-  drawFinishLine(distance);
+    function generateObstacles(){
+      let obs=[]; let pos=300;
+      while(pos<finishLine){
+        let height = Math.floor(Math.random()*51)+20;
+        obs.push({x:pos,y:180-height,width:20,height:height});
+        pos += Math.floor(Math.random()*201)+200;
+      }
+      return obs;
+    }
 
-  document.getElementById("score").textContent="Jarak: "+distance+" / "+finishLine;
+    function drawPlayer(){
+      ctx.drawImage(playerImages[currentPlayer - 1], player.x, player.y, player.size, player.size);
+    }
 
-  if(!gameOver) requestAnimationFrame(update);
-}
+    function drawObstacles(offset){
+      ctx.fillStyle="red";
+      obstacles.forEach(o=> ctx.fillRect(o.x-offset,o.y,o.width,o.height));
+    }
 
-function nextTurn(finished){
-  if(currentPlayer===1){
-    document.getElementById("info").innerHTML="✅ Giliran Abang Fatih selesai! "+(finished?"(Finish dalam "+times[1]+" dtk)":"(Jarak: "+scores[1]+")");
-    document.getElementById("nextTurnBtn").style.display="inline-block";
-  } else {
-    let winnerText="";
-    if(scores[1]>=finishLine && scores[2]>=finishLine){
-      winnerText = times[1]<times[2]?"🎉 Pemenang: Abang Fatih (lebih cepat)!":
-                   times[2]<times[1]?"🎉 Pemenang: Abang Alab (lebih cepat)!":"🤝 Seri! Waktu sama.";
-    } else if(scores[1]>scores[2]) winnerText="🎉 Pemenang: Abang Fatih!";
-    else if(scores[2]>scores[1]) winnerText="🎉 Pemenang: Abang Alab!";
-    else winnerText="🤝 Seri! Jarak sama.";
-    document.getElementById("winner").textContent=winnerText;
-    document.getElementById("info").innerHTML=`Hasil 👉 Fatih: ${scores[1]} (${times[1]?times[1]+" dtk":"belum finish"}) | Alab: ${scores[2]} (${times[2]?times[2]+" dtk":"belum finish"})`;
-    document.getElementById("restartBtn").style.display="inline-block";
-  }
-}
+    function drawFinishLine(offset){
+      ctx.fillStyle="black";
+      ctx.fillRect(finishLine-offset,0,5,canvas.height);
+    }
 
-function startTurn(){
-  resetGame();
-  gameRunning=true;
-  document.getElementById("info").innerHTML="Giliran: "+(currentPlayer===1?"Abang Fatih":"Abang Alab");
-  update();
-}
+    function update(){
+      if(!gameRunning || gameOver) return;
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      if(!startTime) startTime=Date.now();
 
-// Tombol lompat berada di bawah skor
-document.getElementById("jumpBtn").addEventListener("click", ()=>{
-  if(player.grounded && gameRunning){
-    player.vy = player.jump;
-    player.grounded = false;
-  }
-});
+      player.y += player.vy;
+      player.vy += player.gravity;
+      if(player.y>=150){ player.y=150; player.vy=0; player.grounded=true; }
 
-// Spasi tetap bisa digunakan
-document.addEventListener("keydown", e=>{
-  if(e.code==="Space" && player.grounded && gameRunning){
-    player.vy=player.jump;
-    player.grounded=false;
-  }
-});
+      distance += obstacleSpeed;
+      if(distance>finishLine-400) obstacleSpeed=6;
 
-document.getElementById("startBtn").addEventListener("click", ()=>{
-  currentPlayer=1; scores={1:0,2:0}; times={1:null,2:null};
-  document.getElementById("startBtn").style.display="none";
-  document.getElementById("restartBtn").style.display="none";
-  startTurn();
-});
+      if(distance>=finishLine){
+        let timeTaken=(Date.now()-startTime)/1000;
+        gameOver=true; gameRunning=false;
+        scores[currentPlayer]=finishLine;
+        times[currentPlayer]=timeTaken;
+        nextTurn(true);
+        return;
+      }
 
-document.getElementById("nextTurnBtn").addEventListener("click", ()=>{
-  currentPlayer=2;
-  document.getElementById("nextTurnBtn").style.display="none";
-  startTurn();
-});
+      for(let o of obstacles){
+        if(player.x < o.x-distance+o.width && player.x+player.size > o.x-distance && player.y+player.size > o.y){
+          gameOver=true; gameRunning=false;
+          scores[currentPlayer]=distance;
+          nextTurn(false);
+          return;
+        }
+      }
 
-document.getElementById("restartBtn").addEventListener("click", ()=>{
-  currentPlayer=1; scores={1:0,2:0}; times={1:null,2:null};
-  document.getElementById("restartBtn").style.display="none";
-  startTurn();
-});
-</script>
+      drawPlayer();
+      drawObstacles(distance);
+      drawFinishLine(distance);
+
+      document.getElementById("score").textContent="Jarak: "+distance+" / "+finishLine;
+
+      if(!gameOver) requestAnimationFrame(update);
+    }
+
+    function nextTurn(finished){
+      if(currentPlayer===1){
+        document.getElementById("info").innerHTML="✅ Giliran Abang Fatih selesai! "+(finished?"(Finish dalam "+times[1]+" dtk)":"(Jarak: "+scores[1]+")");
+        document.getElementById("nextTurnBtn").style.display="inline-block";
+      } else {
+        let winnerText="";
+        if(scores[1]>=finishLine && scores[2]>=finishLine){
+          winnerText = times[1]<times[2]?"🎉 Pemenang: Abang Fatih (lebih cepat)!":
+                       times[2]<times[1]?"🎉 Pemenang: Abang Alab (lebih cepat)!":"🤝 Seri! Waktu sama.";
+        } else if(scores[1]>scores[2]) winnerText="🎉 Pemenang: Abang Fatih!";
+        else if(scores[2]>scores[1]) winnerText="🎉 Pemenang: Abang Alab!";
+        else winnerText="🤝 Seri! Jarak sama.";
+        document.getElementById("winner").textContent=winnerText;
+        document.getElementById("info").innerHTML=`Hasil 👉 Fatih: ${scores[1]} (${times[1]?times[1]+" dtk":"belum finish"}) | Alab: ${scores[2]} (${times[2]?times[2]+" dtk":"belum finish"})`;
+        document.getElementById("restartBtn").style.display="inline-block";
+      }
+    }
+
+    function startTurn(){
+      resetGame();
+      gameRunning=true;
+      document.getElementById("info").innerHTML="Giliran: "+(currentPlayer===1?"Abang Fatih":"Abang Alab");
+      update();
+    }
+
+    document.getElementById("jumpBtn").addEventListener("click", ()=>{
+      if(player.grounded && gameRunning){
+        player.vy = player.jump;
+        player.grounded = false;
+      }
+    });
+
+    document.addEventListener("keydown", e=>{
+      if(e.code==="Space" && player.grounded && gameRunning){
+        player.vy=player.jump;
+        player.grounded=false;
+      }
+    });
+
+    document.getElementById("startBtn").addEventListener("click", ()=>{
+      currentPlayer=1; scores={1:0,2:0}; times={1:null,2:null};
+      document.getElementById("startBtn").style.display="none";
+      document.getElementById("restartBtn").style.display="none";
+      startTurn();
+    });
+
+    document.getElementById("nextTurnBtn").addEventListener("click", ()=>{
+      currentPlayer=2;
+      document.getElementById("nextTurnBtn").style.display="none";
+      startTurn();
+    });
+
+    document.getElementById("restartBtn").addEventListener("click", ()=>{
+      currentPlayer=1; scores={1:0,2:0}; times={1:null,2:null};
+      document.getElementById("restartBtn").style.display="none";
+      startTurn();
+    });
+  </script>
 </body>
 </html>
