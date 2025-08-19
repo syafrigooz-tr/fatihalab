@@ -30,7 +30,7 @@ const ctx = canvas.getContext("2d");
 let player = { x: 50, y: 150, size: 30, vy: 0, gravity: 1, jump: -15, grounded: true };
 let obstacles = [];
 let distance = 0;
-let finishLine = 2000; // supaya cepat uji coba
+let finishLine = 2000;
 let obstacleSpeed = 3;
 let gameOver = false;
 let currentPlayer = 1; 
@@ -38,6 +38,10 @@ let scores = {1: 0, 2: 0};
 let times = {1: null, 2: null};
 let gameRunning = false;
 let startTime;
+
+// gambar pohon sawit
+const palmImg = new Image();
+palmImg.src = "https://upload.wikimedia.org/wikipedia/commons/3/34/Palmeira_2.png";
 
 function resetGame() {
   player.y = 150; player.vy = 0; player.grounded = true;
@@ -48,13 +52,13 @@ function resetGame() {
   startTime = null;
 }
 
-// buat rintangan pohon sawit
+// buat rintangan pohon sawit tinggi acak
 function generateObstacles() {
   let obs = [];
   let pos = 300;
   while(pos < finishLine){
-    let h = Math.floor(Math.random()*40)+60;
-    obs.push({x: pos, y: 180-h, width: 20, height: h});
+    let h = Math.floor(Math.random()*60)+60; // tinggi 60-120 px
+    obs.push({x: pos, y: 180-h, width: 30, height: h});
     pos += Math.floor(Math.random()*201)+150;
   }
   return obs;
@@ -67,17 +71,7 @@ function drawPlayer() {
 
 function drawObstacles(offset){
   obstacles.forEach(o=>{
-    // batang
-    ctx.fillStyle = "sienna";
-    ctx.fillRect(o.x-offset + o.width/4, o.y + o.height*0.3, o.width/2, o.height*0.7);
-    // daun
-    ctx.fillStyle = "green";
-    ctx.beginPath();
-    ctx.moveTo(o.x-offset, o.y + o.height*0.3);
-    ctx.lineTo(o.x-offset + o.width, o.y + o.height*0.3);
-    ctx.lineTo(o.x-offset + o.width/2, o.y);
-    ctx.closePath();
-    ctx.fill();
+    ctx.drawImage(palmImg, o.x-offset, o.y, o.width, o.height);
   });
 }
 
