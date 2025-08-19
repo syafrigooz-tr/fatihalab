@@ -36,10 +36,6 @@
 <button id="jumpBtn">Lompat</button>
 <div id="winner"></div>
 
-<!-- Elemen gambar untuk player -->
-<img id="player1" src="https://i.ibb.co/9yQ7QYF/cartoon-boy-blue.png" style="display:none">
-<img id="player2" src="https://i.ibb.co/d7v9b8h/cartoon-boy-green.png" style="display:none">
-
 <script>
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
@@ -56,10 +52,13 @@ let times = {1:null,2:null};
 let gameRunning = false;
 let startTime;
 
+// Gambar player langsung (direct image link)
 const playerImages = [
-  document.getElementById("player1"),
-  document.getElementById("player2")
+  new Image(),
+  new Image()
 ];
+playerImages[0].src = 'https://i.ibb.co/fD0G2YQ/cartoon-boy-blue.png'; // Abang Fatih
+playerImages[1].src = 'https://i.ibb.co/x1T3FhS/cartoon-boy-green.png'; // Abang Alab
 
 function resetGame(){
   player.y = 150; player.vy=0; player.grounded=true;
