@@ -51,14 +51,18 @@
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
 
+    // 🔹 Muat gambar pohon sawit
+    const palmImg = new Image();
+    palmImg.src = "sawit.png"; // ganti dengan path file pohon sawit kamu
+
     let player = { x: 50, y: 150, size: 30, vy: 0, gravity: 1, jump: -15, grounded: true };
     let obstacles = [];
     let score = 0;
     let distance = 0;
-    let finishLine = 15000; // 🔹 panjang lintasan diperpanjang 3x
+    let finishLine = 15000; 
     let obstacleSpeed = 3;
     let gameOver = false;
-    let currentPlayer = 1; // 1 = Fatih, 2 = Alab
+    let currentPlayer = 1; 
     let scores = {1: 0, 2: 0};
     let times = {1: null, 2: null};
     let gameRunning = false;
@@ -78,14 +82,15 @@
       startTime = null;
     }
 
-    // 🔹 Fungsi generateObstacles terbaru dengan tinggi dan jarak bervariasi
+    // 🔹 Generate obstacle berupa pohon sawit
     function generateObstacles() {
       let obs = [];
-      let position = 300; // posisi awal
+      let position = 300;
       while (position < finishLine) {
-        let height = Math.floor(Math.random() * 51) + 20; // tinggi 20-70 px
-        obs.push({ x: position, y: 180 - height, width: 20, height: height });
-        let gap = Math.floor(Math.random() * 201) + 200; // jarak antar 200-400 px
+        let height = Math.floor(Math.random() * 51) + 50; // tinggi 50-100 px
+        let width = Math.floor(height * 0.6); // lebar proporsional
+        obs.push({ x: position, y: 180 - height, width: width, height: height });
+        let gap = Math.floor(Math.random() * 201) + 200; 
         position += gap;
       }
       return obs;
@@ -97,9 +102,8 @@
     }
 
     function drawObstacles(offset) {
-      ctx.fillStyle = "red";
       for (let o of obstacles) {
-        ctx.fillRect(o.x - offset, o.y, o.width, o.height);
+        ctx.drawImage(palmImg, o.x - offset, o.y, o.width, o.height);
       }
     }
 
@@ -110,7 +114,6 @@
 
     function update() {
       if (!gameRunning || gameOver) return;
-
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       if (!startTime) startTime = Date.now();
@@ -124,10 +127,10 @@
         player.grounded = true;
       }
 
-      // Update jarak (semakin dekat finish → makin cepat)
+      // Update jarak
       distance += obstacleSpeed;
       if (distance > finishLine - 400) {
-        obstacleSpeed = 6; // percepat menjelang finish
+        obstacleSpeed = 6; 
       }
 
       // Cek finish
@@ -162,7 +165,6 @@
       drawFinishLine(distance);
 
       document.getElementById("score").textContent = "Jarak: " + distance + " / " + finishLine;
-
       if (!gameOver) requestAnimationFrame(update);
     }
 
@@ -173,7 +175,6 @@
           (finished ? "(Finish dalam " + times[1] + " dtk)" : "(Jarak: " + scores[1] + ")");
         document.getElementById("nextTurnBtn").style.display = "inline-block";
       } else {
-        // Tentukan pemenang
         let winnerText = "";
         if (scores[1] >= finishLine && scores[2] >= finishLine) {
           winnerText = times[1] < times[2] ? "🎉 Pemenang: Abang Fatih (lebih cepat)!" : 
