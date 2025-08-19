@@ -38,161 +38,164 @@
 
   <div id="winner"></div>
 
-  <script>
-    const canvas = document.getElementById("gameCanvas");
-    const ctx = canvas.getContext("2d");
+<script>
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
 
-    const playerImages = [
-      new Image(),
-      new Image()
-    ];
-    playerImages[0].src = 'https://img.freepik.com/free-photo/3d-rendering-cartoon-boy_11293347.htm';
-    playerImages[1].src = 'https://img.freepik.com/free-photo/3d-rendering-cartoon-boy_11293347.htm';
+// Ganti player menjadi gambar bebas hak cipta
+const playerImages = [
+  new Image(),
+  new Image()
+];
+// Player 1: Abang Fatih
+playerImages[0].src = 'https://cdn.pixabay.com/photo/2016/03/31/20/11/child-1299806_960_720.png';
+// Player 2: Abang Alab
+playerImages[1].src = 'https://cdn.pixabay.com/photo/2016/03/31/20/11/child-1299807_960_720.png';
 
-    let player = { x: 50, y: 150, size: 30, vy: 0, gravity: 1, jump: -15, grounded: true };
-    let obstacles = [];
-    let distance = 0;
-    let finishLine = 15000;
-    let obstacleSpeed = 3;
-    let gameOver = false;
-    let currentPlayer = 1;
-    let scores = {1:0,2:0};
-    let times = {1:null,2:null};
-    let gameRunning = false;
-    let startTime;
+let player = { x: 50, y: 150, size: 40, vy: 0, gravity: 1, jump: -15, grounded: true };
+let obstacles = [];
+let distance = 0;
+let finishLine = 15000;
+let obstacleSpeed = 3;
+let gameOver = false;
+let currentPlayer = 1;
+let scores = {1:0,2:0};
+let times = {1:null,2:null};
+let gameRunning = false;
+let startTime;
 
-    function resetGame(){
-      player.y = 150; player.vy=0; player.grounded=true;
-      obstacles = generateObstacles();
-      distance=0; gameOver=false; obstacleSpeed=3;
-      document.getElementById("score").textContent = "Jarak: 0 / " + finishLine;
-      document.getElementById("winner").textContent = "";
-      startTime = null;
+function resetGame(){
+  player.y = 150; player.vy=0; player.grounded=true;
+  obstacles = generateObstacles();
+  distance=0; gameOver=false; obstacleSpeed=3;
+  document.getElementById("score").textContent = "Jarak: 0 / " + finishLine;
+  document.getElementById("winner").textContent = "";
+  startTime = null;
+}
+
+function generateObstacles(){
+  let obs=[]; let pos=300;
+  while(pos<finishLine){
+    let height = Math.floor(Math.random()*51)+20;
+    obs.push({x:pos,y:180-height,width:20,height:height});
+    pos += Math.floor(Math.random()*201)+200;
+  }
+  return obs;
+}
+
+function drawPlayer(){
+  const img = playerImages[currentPlayer-1];
+  ctx.drawImage(img, player.x, player.y, player.size, player.size);
+}
+
+function drawObstacles(offset){
+  ctx.fillStyle="red";
+  obstacles.forEach(o=> ctx.fillRect(o.x-offset,o.y,o.width,o.height));
+}
+
+function drawFinishLine(offset){
+  ctx.fillStyle="black";
+  ctx.fillRect(finishLine-offset,0,5,canvas.height);
+}
+
+function update(){
+  if(!gameRunning || gameOver) return;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  if(!startTime) startTime=Date.now();
+
+  player.y += player.vy;
+  player.vy += player.gravity;
+  if(player.y>=150){ player.y=150; player.vy=0; player.grounded=true; }
+
+  distance += obstacleSpeed;
+  if(distance>finishLine-400) obstacleSpeed=6;
+
+  if(distance>=finishLine){
+    let timeTaken=(Date.now()-startTime)/1000;
+    gameOver=true; gameRunning=false;
+    scores[currentPlayer]=finishLine;
+    times[currentPlayer]=timeTaken;
+    nextTurn(true);
+    return;
+  }
+
+  for(let o of obstacles){
+    if(player.x < o.x-distance+o.width && player.x+player.size > o.x-distance && player.y+player.size > o.y){
+      gameOver=true; gameRunning=false;
+      scores[currentPlayer]=distance;
+      nextTurn(false);
+      return;
     }
+  }
 
-    function generateObstacles(){
-      let obs=[]; let pos=300;
-      while(pos<finishLine){
-        let height = Math.floor(Math.random()*51)+20;
-        obs.push({x:pos,y:180-height,width:20,height:height});
-        pos += Math.floor(Math.random()*201)+200;
-      }
-      return obs;
-    }
+  drawPlayer();
+  drawObstacles(distance);
+  drawFinishLine(distance);
 
-    function drawPlayer(){
-      const img = playerImages[currentPlayer-1];
-      ctx.drawImage(img, player.x, player.y, player.size, player.size);
-    }
+  document.getElementById("score").textContent="Jarak: "+distance+" / "+finishLine;
 
-    function drawObstacles(offset){
-      ctx.fillStyle="red";
-      obstacles.forEach(o=> ctx.fillRect(o.x-offset,o.y,o.width,o.height));
-    }
+  if(!gameOver) requestAnimationFrame(update);
+}
 
-    function drawFinishLine(offset){
-      ctx.fillStyle="black";
-      ctx.fillRect(finishLine-offset,0,5,canvas.height);
-    }
+function nextTurn(finished){
+  if(currentPlayer===1){
+    document.getElementById("info").innerHTML="✅ Giliran Abang Fatih selesai! "+(finished?"(Finish dalam "+times[1]+" dtk)":"(Jarak: "+scores[1]+")");
+    document.getElementById("nextTurnBtn").style.display="inline-block";
+  } else {
+    let winnerText="";
+    if(scores[1]>=finishLine && scores[2]>=finishLine){
+      winnerText = times[1]<times[2]?"🎉 Pemenang: Abang Fatih (lebih cepat)!":
+                   times[2]<times[1]?"🎉 Pemenang: Abang Alab (lebih cepat)!":"🤝 Seri! Waktu sama.";
+    } else if(scores[1]>scores[2]) winnerText="🎉 Pemenang: Abang Fatih!";
+    else if(scores[2]>scores[1]) winnerText="🎉 Pemenang: Abang Alab!";
+    else winnerText="🤝 Seri! Jarak sama.";
+    document.getElementById("winner").textContent=winnerText;
+    document.getElementById("info").innerHTML=`Hasil 👉 Fatih: ${scores[1]} (${times[1]?times[1]+" dtk":"belum finish"}) | Alab: ${scores[2]} (${times[2]?times[2]+" dtk":"belum finish"})`;
+    document.getElementById("restartBtn").style.display="inline-block";
+  }
+}
 
-    function update(){
-      if(!gameRunning || gameOver) return;
-      ctx.clearRect(0,0,canvas.width,canvas.height);
-      if(!startTime) startTime=Date.now();
+function startTurn(){
+  resetGame();
+  gameRunning=true;
+  document.getElementById("info").innerHTML="Giliran: "+(currentPlayer===1?"Abang Fatih":"Abang Alab");
+  update();
+}
 
-      player.y += player.vy;
-      player.vy += player.gravity;
-      if(player.y>=150){ player.y=150; player.vy=0; player.grounded=true; }
+// Tombol lompat
+document.getElementById("jumpBtn").addEventListener("click", ()=>{
+  if(player.grounded && gameRunning){
+    player.vy = player.jump;
+    player.grounded = false;
+  }
+});
 
-      distance += obstacleSpeed;
-      if(distance>finishLine-400) obstacleSpeed=6;
+// Spasi
+document.addEventListener("keydown", e=>{
+  if(e.code==="Space" && player.grounded && gameRunning){
+    player.vy=player.jump;
+    player.grounded=false;
+  }
+});
 
-      if(distance>=finishLine){
-        let timeTaken=(Date.now()-startTime)/1000;
-        gameOver=true; gameRunning=false;
-        scores[currentPlayer]=finishLine;
-        times[currentPlayer]=timeTaken;
-        nextTurn(true);
-        return;
-      }
+document.getElementById("startBtn").addEventListener("click", ()=>{
+  currentPlayer=1; scores={1:0,2:0}; times={1:null,2:null};
+  document.getElementById("startBtn").style.display="none";
+  document.getElementById("restartBtn").style.display="none";
+  startTurn();
+});
 
-      for(let o of obstacles){
-        if(player.x < o.x-distance+o.width && player.x+player.size > o.x-distance && player.y+player.size > o.y){
-          gameOver=true; gameRunning=false;
-          scores[currentPlayer]=distance;
-          nextTurn(false);
-          return;
-        }
-      }
+document.getElementById("nextTurnBtn").addEventListener("click", ()=>{
+  currentPlayer=2;
+  document.getElementById("nextTurnBtn").style.display="none";
+  startTurn();
+});
 
-      drawPlayer();
-      drawObstacles(distance);
-      drawFinishLine(distance);
-
-      document.getElementById("score").textContent="Jarak: "+distance+" / "+finishLine;
-
-      if(!gameOver) requestAnimationFrame(update);
-    }
-
-    function nextTurn(finished){
-      if(currentPlayer===1){
-        document.getElementById("info").innerHTML="✅ Giliran Abang Fatih selesai! "+(finished?"(Finish dalam "+times[1]+" dtk)":"(Jarak: "+scores[1]+")");
-        document.getElementById("nextTurnBtn").style.display="inline-block";
-      } else {
-        let winnerText="";
-        if(scores[1]>=finishLine && scores[2]>=finishLine){
-          winnerText = times[1]<times[2]?"🎉 Pemenang: Abang Fatih (lebih cepat)!":
-                       times[2]<times[1]?"🎉 Pemenang: Abang Alab (lebih cepat)!":"🤝 Seri! Waktu sama.";
-        } else if(scores[1]>scores[2]) winnerText="🎉 Pemenang: Abang Fatih!";
-        else if(scores[2]>scores[1]) winnerText="🎉 Pemenang: Abang Alab!";
-        else winnerText="🤝 Seri! Jarak sama.";
-        document.getElementById("winner").textContent=winnerText;
-        document.getElementById("info").innerHTML=`Hasil 👉 Fatih: ${scores[1]} (${times[1]?times[1]+" dtk":"belum finish"}) | Alab: ${scores[2]} (${times[2]?times[2]+" dtk":"belum finish"})`;
-        document.getElementById("restartBtn").style.display="inline-block";
-      }
-    }
-
-    function startTurn(){
-      resetGame();
-      gameRunning=true;
-      document.getElementById("info").innerHTML="Giliran: "+(currentPlayer===1?"Abang Fatih":"Abang Alab");
-      update();
-    }
-
-    // Tombol lompat berada di bawah skor
-    document.getElementById("jumpBtn").addEventListener("click", ()=>{
-      if(player.grounded && gameRunning){
-        player.vy = player.jump;
-        player.grounded = false;
-      }
-    });
-
-    // Spasi tetap bisa digunakan
-    document.addEventListener("keydown", e=>{
-      if(e.code==="Space" && player.grounded && gameRunning){
-        player.vy=player.jump;
-        player.grounded=false;
-      }
-    });
-
-    document.getElementById("startBtn").addEventListener("click", ()=>{
-      currentPlayer=1; scores={1:0,2:0}; times={1:null,2:null};
-      document.getElementById("startBtn").style.display="none";
-      document.getElementById("restartBtn").style.display="none";
-      startTurn();
-    });
-
-    document.getElementById("nextTurnBtn").addEventListener("click", ()=>{
-      currentPlayer=2;
-      document.getElementById("nextTurnBtn").style.display="none";
-      startTurn();
-    });
-
-    document.getElementById("restartBtn").addEventListener("click", ()=>{
-      currentPlayer=1; scores={1:0,2:0}; times={1:null,2:null};
-      document.getElementById("restartBtn").style.display="none";
-      startTurn();
-    });
-  </script>
+document.getElementById("restartBtn").addEventListener("click", ()=>{
+  currentPlayer=1; scores={1:0,2:0}; times={1:null,2:null};
+  document.getElementById("restartBtn").style.display="none";
+  startTurn();
+});
+</script>
 </body>
 </html>
