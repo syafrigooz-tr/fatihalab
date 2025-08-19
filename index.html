@@ -51,9 +51,9 @@
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
 
-    // 🔹 Muat gambar pohon sawit dari internet (PNG transparan)
+    // 🔹 Muat gambar pohon sawit dari internet (link aman untuk GitHub Pages)
     const palmImg = new Image();
-    palmImg.src = "https://pngimg.com/uploads/palm_tree/palm_tree_PNG93295.png";
+    palmImg.src = "https://raw.githubusercontent.com/mdn/learning-area/master/html/canvas/drawimage/palm-tree.png";
 
     let player = { x: 50, y: 150, size: 30, vy: 0, gravity: 1, jump: -15, grounded: true };
     let obstacles = [];
