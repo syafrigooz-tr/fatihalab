@@ -9,7 +9,17 @@
   canvas { border: 2px solid #333; display: block; margin: 20px auto; background: white; }
   #info, #score, #winner { font-size: 18px; margin-top: 10px; }
   button { padding: 10px 20px; font-size: 18px; margin-top: 15px; cursor: pointer; display: inline-block; }
-  #jumpBtn { padding: 20px 40px; font-size: 24px; background:#28a745; color:white; border:none; border-radius:10px; }
+  #jumpBtn { 
+    padding: 20px 40px; 
+    font-size: 24px; 
+    background: #28a745; 
+    color: white; 
+    border: none; 
+    border-radius: 15px; 
+    margin: 10px;
+    width: 150px;
+    height: 80px;
+  }
   #restartBtn, #nextTurnBtn { display: none; }
 </style>
 </head>
@@ -141,8 +151,8 @@ function startTurn(){
   update();
 }
 
-// Tombol lompat
-document.getElementById("jumpBtn").addEventListener("click",()=>{
+// Tombol lompat untuk touch dan klik
+document.getElementById("jumpBtn").addEventListener("click", ()=>{
   if(player.grounded && gameRunning){
     player.vy = player.jump;
     player.grounded = false;
