@@ -9,15 +9,7 @@
   canvas { border: 2px solid #333; display: block; margin: 20px auto; background: white; }
   #info, #score, #winner { font-size: 18px; margin-top: 10px; }
   button { padding: 10px 20px; font-size: 18px; margin-top: 15px; cursor: pointer; display: inline-block; }
-  #jumpBtn { 
-    padding: 15px 40px; 
-    font-size: 22px; 
-    background: #28a745; 
-    color: white; 
-    border: none; 
-    border-radius: 10px; 
-    margin-top: 10px;
-  }
+  #jumpBtn { padding: 15px 40px; font-size: 22px; background: #28a745; color: white; border: none; border-radius: 10px; margin-top: 10px; }
   #restartBtn, #nextTurnBtn { display: none; }
 </style>
 </head>
@@ -32,7 +24,6 @@
 <canvas id="gameCanvas" width="600" height="200"></canvas>
 <div id="info"></div>
 <div id="score"></div>
-
 <button id="jumpBtn">Lompat</button>
 <div id="winner"></div>
 
@@ -52,15 +43,15 @@ let times = {1:null,2:null};
 let gameRunning = false;
 let startTime;
 
-// Gambar player (gunakan URL file PNG)
+// Gambar player (valid PNG)
 const playerImages = [
   new Image(),
   new Image()
 ];
-playerImages[0].src = 'https://i.ibb.co/fD0G2YQ/cartoon-boy-blue.png'; // Abang Fatih
-playerImages[1].src = 'https://i.ibb.co/x1T3FhS/cartoon-boy-green.png'; // Abang Alab
+playerImages[0].src = 'https://i.ibb.co/2dN58wF/cartoon-boy-blue.png'; // Abang Fatih
+playerImages[1].src = 'https://i.ibb.co/Bqf7Q7M/cartoon-boy-green.png'; // Abang Alab
 
-// Tunggu gambar load sebelum game bisa dimulai
+// Tombol start aktif setelah gambar load
 let imagesLoaded = 0;
 playerImages.forEach(img => {
   img.onload = () => {
@@ -91,8 +82,7 @@ function generateObstacles(){
 }
 
 function drawPlayer(){
-  const img = playerImages[currentPlayer - 1];
-  ctx.drawImage(img, player.x, player.y, player.size, player.size);
+  ctx.drawImage(playerImages[currentPlayer - 1], player.x, player.y, player.size, player.size);
 }
 
 function drawObstacles(offset){
@@ -110,6 +100,7 @@ function update(){
   ctx.clearRect(0,0,canvas.width,canvas.height);
   if(!startTime) startTime=Date.now();
 
+  // Update posisi player
   player.y += player.vy;
   player.vy += player.gravity;
   if(player.y>=150){ player.y=150; player.vy=0; player.grounded=true; }
@@ -117,6 +108,7 @@ function update(){
   distance += obstacleSpeed;
   if(distance>finishLine-400) obstacleSpeed=6;
 
+  // Check finish
   if(distance>=finishLine){
     let timeTaken=(Date.now()-startTime)/1000;
     gameOver=true; gameRunning=false;
@@ -126,6 +118,7 @@ function update(){
     return;
   }
 
+  // Check collision
   for(let o of obstacles){
     if(player.x < o.x-distance+o.width && player.x+player.size > o.x-distance && player.y+player.size > o.y){
       gameOver=true; gameRunning=false;
