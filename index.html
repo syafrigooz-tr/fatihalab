@@ -54,19 +54,19 @@ function resetGame() {
   startTime = null;
 }
 
-// 🔹 Fungsi generateObstacles terbaru
+// 🔹 Fungsi generateObstacles terbaru dengan warna dan tinggi rintangan berbeda
 function generateObstacles() {
   let obs = [];
   let position = 300;
 
   while (position < finishLine) {
     let height;
-    if (position < 10000) {
-      // Hanya rintangan rendah & menengah
+    if (position < finishLine * 2 / 3) {
+      // Hanya rintangan rendah & menengah di 2/3 awal
       let type = Math.random() < 0.5 ? 1 : 2;
       height = type === 1 ? Math.floor(Math.random()*21)+20 : Math.floor(Math.random()*30)+41;
     } else {
-      // 10000–15000 → rintangan rendah, menengah, atau tinggi
+      // 1/3 terakhir → rintangan rendah, menengah, atau tinggi
       let rand = Math.random();
       if (rand < 0.33) height = Math.floor(Math.random()*21)+20;   // rendah
       else if (rand < 0.66) height = Math.floor(Math.random()*30)+41; // menengah
@@ -81,8 +81,23 @@ function generateObstacles() {
   return obs;
 }
 
-function drawPlayer() { ctx.fillStyle = currentPlayer===1?"blue":"green"; ctx.fillRect(player.x,player.y,player.size,player.size); }
-function drawObstacles(offset) { ctx.fillStyle="red"; obstacles.forEach(o=>ctx.fillRect(o.x-offset,o.y,o.width,o.height)); }
+function drawPlayer() { 
+  ctx.fillStyle = currentPlayer===1 ? "blue" : "green"; 
+  ctx.fillRect(player.x, player.y, player.size, player.size); 
+}
+
+// 🔹 drawObstacles dengan warna berbeda sesuai tinggi
+function drawObstacles(offset) {
+  obstacles.forEach(o => {
+    let color;
+    if (o.height <= 40) color = "green";       // rendah
+    else if (o.height <= 70) color = "orange"; // menengah
+    else color = "red";                         // tinggi
+    ctx.fillStyle = color;
+    ctx.fillRect(o.x - offset, o.y, o.width, o.height);
+  });
+}
+
 function drawFinishLine(offset) { ctx.fillStyle="black"; ctx.fillRect(finishLine-offset,0,5,canvas.height); }
 
 function update() {
@@ -90,7 +105,8 @@ function update() {
   ctx.clearRect(0,0,canvas.width,canvas.height);
   if(!startTime) startTime=Date.now();
 
-  player.y += player.vy; player.vy += player.gravity;
+  player.y += player.vy; 
+  player.vy += player.gravity;
   if(player.y>=150){ player.y=150; player.vy=0; player.grounded=true; }
 
   distance += obstacleSpeed;
@@ -112,7 +128,9 @@ function update() {
     }
   }
 
-  drawPlayer(); drawObstacles(distance); drawFinishLine(distance);
+  drawPlayer(); 
+  drawObstacles(distance); 
+  drawFinishLine(distance);
   document.getElementById("score").textContent = "Jarak: " + distance + " / " + finishLine;
   if(!gameOver) requestAnimationFrame(update);
 }
@@ -135,13 +153,38 @@ function nextTurn(finished){
   }
 }
 
-function startTurn(){ resetGame(); gameRunning=true; document.getElementById("info").innerHTML="Giliran: <b>"+(currentPlayer===1?"Abang Fatih":"Abang Alab")+"</b>"; update(); }
+function startTurn(){ 
+  resetGame(); 
+  gameRunning=true; 
+  document.getElementById("info").innerHTML="Giliran: <b>"+(currentPlayer===1?"Abang Fatih":"Abang Alab")+"</b>"; 
+  update(); 
+}
 
-document.addEventListener("keydown",e=>{ if(e.code==="Space" && player.grounded && gameRunning){ player.vy=player.jump; player.grounded=false; } });
+document.addEventListener("keydown", e => { 
+  if(e.code==="Space" && player.grounded && gameRunning){ 
+    player.vy=player.jump; 
+    player.grounded=false; 
+  } 
+});
 
-document.getElementById("startBtn").addEventListener("click",()=>{ currentPlayer=1; scores={1:0,2:0}; times={1:null,2:null}; document.getElementById("startBtn").style.display="none"; document.getElementById("restartBtn").style.display="none"; startTurn(); });
-document.getElementById("nextTurnBtn").addEventListener("click",()=>{ currentPlayer=2; document.getElementById("nextTurnBtn").style.display="none"; startTurn(); });
-document.getElementById("restartBtn").addEventListener("click",()=>{ currentPlayer=1; scores={1:0,2:0}; times={1:null,2:null}; document.getElementById("restartBtn").style.display="none"; startTurn(); });
+document.getElementById("startBtn").addEventListener("click", ()=>{ 
+  currentPlayer=1; scores={1:0,2:0}; times={1:null,2:null}; 
+  document.getElementById("startBtn").style.display="none"; 
+  document.getElementById("restartBtn").style.display="none"; 
+  startTurn(); 
+});
+
+document.getElementById("nextTurnBtn").addEventListener("click", ()=>{ 
+  currentPlayer=2; 
+  document.getElementById("nextTurnBtn").style.display="none"; 
+  startTurn(); 
+});
+
+document.getElementById("restartBtn").addEventListener("click", ()=>{ 
+  currentPlayer=1; scores={1:0,2:0}; times={1:null,2:null}; 
+  document.getElementById("restartBtn").style.display="none"; 
+  startTurn(); 
+});
 </script>
 </body>
 </html>
