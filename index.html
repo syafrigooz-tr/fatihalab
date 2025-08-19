@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Game Abang Fatih vs Abang Alab</title>
 <style>
-  body { font-family: Arial, sans-serif; text-align: center; margin: 0; padding: 20px; background: #f0f0f0; }
+  body { font-family: Arial; text-align: center; margin: 0; padding: 20px; background: #f0f0f0; }
   canvas { border: 2px solid #333; display: block; margin: 20px auto; background: white; }
   #info, #score, #winner { font-size: 18px; margin-top: 10px; }
   button { padding: 10px 20px; font-size: 18px; margin-top: 15px; cursor: pointer; }
@@ -34,17 +34,17 @@ const ctx = canvas.getContext("2d");
 let player = { x: 50, y: 150, size: 30, vy: 0, gravity: 1, jump: -15, grounded: true };
 let obstacles = [];
 let distance = 0;
-let finishLine = 1000; // lebih pendek agar playable
-let obstacleSpeed = 5; // lebih cepat
+let finishLine = 600; 
+let obstacleSpeed = 5; 
 let gameOver = false;
 let currentPlayer = 1;
-let scores = {1:0, 2:0};
-let times = {1:null, 2:null};
+let scores = {1:0,2:0};
+let times = {1:null,2:null};
 let gameRunning = false;
 let startTime;
 
 function resetGame(){
-  player.y = 150; player.vy=0; player.grounded=true;
+  player.y = 150; player.vy = 0; player.grounded = true;
   obstacles = generateObstacles();
   distance = 0; gameOver = false;
   document.getElementById("score").textContent = "Jarak: 0 / " + finishLine;
@@ -54,11 +54,11 @@ function resetGame(){
 
 function generateObstacles(){
   let obs = [];
-  let pos = 300;
+  let pos = 200;
   while(pos < finishLine){
     let height = Math.floor(Math.random()*50)+20;
     obs.push({x: pos, y: 180-height, width: 20, height: height});
-    pos += Math.floor(Math.random()*150)+100;
+    pos += Math.floor(Math.random()*150)+50; // jarak pendek
   }
   return obs;
 }
@@ -68,14 +68,14 @@ function drawPlayer(){
   ctx.fillRect(player.x, player.y, player.size, player.size);
 }
 
-function drawObstacles(offset){
+function drawObstacles(){
   ctx.fillStyle = "red";
-  obstacles.forEach(o => ctx.fillRect(o.x-offset, o.y, o.width, o.height));
+  obstacles.forEach(o => ctx.fillRect(o.x-distance, o.y, o.width, o.height));
 }
 
-function drawFinishLine(offset){
+function drawFinishLine(){
   ctx.fillStyle = "black";
-  ctx.fillRect(finishLine-offset, 0, 5, canvas.height);
+  ctx.fillRect(finishLine-distance, 0, 5, canvas.height);
 }
 
 function update(){
@@ -85,12 +85,12 @@ function update(){
 
   player.y += player.vy;
   player.vy += player.gravity;
-  if(player.y >= 150){ player.y = 150; player.vy=0; player.grounded=true; }
+  if(player.y >= 150){ player.y = 150; player.vy = 0; player.grounded = true; }
 
   distance += obstacleSpeed;
 
   if(distance >= finishLine){
-    let timeTaken = ((Date.now() - startTime)/1000).toFixed(2);
+    let timeTaken = ((Date.now()-startTime)/1000).toFixed(2);
     gameOver = true; gameRunning = false;
     scores[currentPlayer] = finishLine;
     times[currentPlayer] = timeTaken;
@@ -108,12 +108,12 @@ function update(){
   }
 
   drawPlayer();
-  drawObstacles(distance);
-  drawFinishLine(distance);
+  drawObstacles();
+  drawFinishLine();
 
   document.getElementById("score").textContent = "Jarak: "+distance+" / "+finishLine;
 
-  if(!gameOver) requestAnimationFrame(update);
+  requestAnimationFrame(update);
 }
 
 function nextTurn(finished){
@@ -121,12 +121,12 @@ function nextTurn(finished){
     document.getElementById("info").innerHTML = "✅ Giliran Abang Fatih selesai! "+(finished?"(Finish dalam "+times[1]+" dtk)":"(Jarak: "+scores[1]+")");
     document.getElementById("nextTurnBtn").style.display = "inline-block";
   } else {
-    let winnerText="";
-    if(scores[1] > scores[2]) winnerText="🎉 Pemenang: Abang Fatih!";
-    else if(scores[2] > scores[1]) winnerText="🎉 Pemenang: Abang Alab!";
-    else winnerText="🤝 Seri!";
+    let winnerText = "";
+    if(scores[1] > scores[2]) winnerText = "🎉 Pemenang: Abang Fatih!";
+    else if(scores[2] > scores[1]) winnerText = "🎉 Pemenang: Abang Alab!";
+    else winnerText = "🤝 Seri!";
     document.getElementById("winner").textContent = winnerText;
-    document.getElementById("info").innerHTML = `Hasil 👉 Fatih: ${scores[1]} (${times[1]?times[1]+" dtk":"belum finish"}) | Alab: ${scores[2]} (${times[2]?times[2]+" dtk":"belum finish"})`;
+    document.getElementById("info").innerHTML = `Hasil 👉 Fatih: ${scores[1]} | Alab: ${scores[2]}`;
     document.getElementById("restartBtn").style.display = "inline-block";
   }
 }
@@ -146,7 +146,7 @@ document.getElementById("jumpBtn").addEventListener("click", ()=>{
 });
 
 document.addEventListener("keydown", e=>{
-  if(e.code==="Space" && player.grounded && gameRunning){
+  if(e.code === "Space" && player.grounded && gameRunning){
     player.vy = player.jump;
     player.grounded = false;
   }
