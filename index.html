@@ -51,34 +51,13 @@
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
 
-    // 🔹 Semua gambar
-    const bgImg = new Image();
-    bgImg.src = "https://raw.githubusercontent.com/mdn/learning-area/master/html/canvas/drawimage/sky.png";
-
+    // 🔹 Muat gambar pohon sawit dari internet (link aman untuk GitHub Pages)
     const palmImg = new Image();
     palmImg.src = "https://raw.githubusercontent.com/mdn/learning-area/master/html/canvas/drawimage/palm-tree.png";
 
-    const playerImg = new Image();
-    playerImg.src = "https://raw.githubusercontent.com/mdn/learning-area/master/html/canvas/drawimage/small-boy.png";
-
-    let imagesLoaded = 0;
-    const totalImages = 3;
-
-    function onImageLoad() {
-      imagesLoaded++;
-      if (imagesLoaded === totalImages) {
-        document.getElementById("startBtn").disabled = false;
-      }
-    }
-
-    bgImg.onload = onImageLoad;
-    palmImg.onload = onImageLoad;
-    playerImg.onload = onImageLoad;
-
-    document.getElementById("startBtn").disabled = true;
-
-    let player = { x: 50, y: 150, width: 30, height: 30, vy: 0, gravity: 1, jump: -15, grounded: true };
+    let player = { x: 50, y: 150, size: 30, vy: 0, gravity: 1, jump: -15, grounded: true };
     let obstacles = [];
+    let score = 0;
     let distance = 0;
     let finishLine = 15000; 
     let obstacleSpeed = 3;
@@ -94,6 +73,7 @@
       player.vy = 0;
       player.grounded = true;
       obstacles = generateObstacles();
+      score = 0;
       distance = 0;
       gameOver = false;
       obstacleSpeed = 3;
@@ -102,12 +82,13 @@
       startTime = null;
     }
 
+    // 🔹 Generate obstacle berupa pohon sawit
     function generateObstacles() {
       let obs = [];
       let position = 300;
       while (position < finishLine) {
-        let height = Math.floor(Math.random() * 51) + 50;
-        let width = Math.floor(height * 0.6);
+        let height = Math.floor(Math.random() * 51) + 50; // tinggi 50-100 px
+        let width = Math.floor(height * 0.6); // lebar proporsional
         obs.push({ x: position, y: 180 - height, width: width, height: height });
         let gap = Math.floor(Math.random() * 201) + 200; 
         position += gap;
@@ -116,7 +97,8 @@
     }
 
     function drawPlayer() {
-      ctx.drawImage(playerImg, player.x, player.y, player.width, player.height);
+      ctx.fillStyle = currentPlayer === 1 ? "blue" : "green";
+      ctx.fillRect(player.x, player.y, player.size, player.size);
     }
 
     function drawObstacles(offset) {
@@ -134,9 +116,6 @@
       if (!gameRunning || gameOver) return;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Draw background
-      ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
-
       if (!startTime) startTime = Date.now();
 
       // Update player
@@ -150,7 +129,9 @@
 
       // Update jarak
       distance += obstacleSpeed;
-      if (distance > finishLine - 400) obstacleSpeed = 6;
+      if (distance > finishLine - 400) {
+        obstacleSpeed = 6; 
+      }
 
       // Cek finish
       if (distance >= finishLine) {
@@ -167,8 +148,8 @@
       for (let o of obstacles) {
         if (
           player.x < o.x - distance + o.width &&
-          player.x + player.width > o.x - distance &&
-          player.y + player.height > o.y
+          player.x + player.size > o.x - distance &&
+          player.y + player.size > o.y
         ) {
           gameOver = true;
           gameRunning = false;
@@ -178,6 +159,7 @@
         }
       }
 
+      // Draw
       drawPlayer();
       drawObstacles(distance);
       drawFinishLine(distance);
