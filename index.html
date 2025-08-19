@@ -42,9 +42,11 @@ let startTime;
 // Gambar kartun pohon sawit
 const palmImg = new Image();
 palmImg.src = "https://upload.wikimedia.org/wikipedia/commons/3/34/Palmeira_2.png";
+let imageReady = false;
 
-// Aktifkan tombol start setelah gambar dimuat
+// Tunggu gambar siap
 palmImg.onload = function() {
+  imageReady = true;
   document.getElementById("startBtn").disabled = false;
 };
 
@@ -73,8 +75,8 @@ function drawPlayer() {
   ctx.fillRect(player.x, player.y, player.size, player.size);
 }
 
-// gambar sawit: daun kecil di atas, batang panjang ke bawah
 function drawObstacles(offset){
+  if(!imageReady) return; // jangan gambar sebelum gambar siap
   obstacles.forEach(o=>{
     let drawWidth = o.width;
     let drawHeight = o.height;
@@ -114,9 +116,7 @@ function update(){
   for(let o of obstacles){
     let hitX = o.x - distance;
     let hitWidth = o.width;
-    let hitY = o.y + o.height*0.2;  // batang mulai sedikit di bawah daun
-    let hitHeight = o.height*0.8;   // batang lebih panjang ke bawah
-
+    let hitY = o.y + o.height*0.2;
     if(player.x + player.size > hitX && player.x < hitX + hitWidth &&
        player.y + player.size > hitY){
       gameOver=true; gameRunning=false;
