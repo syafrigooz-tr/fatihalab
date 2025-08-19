@@ -27,15 +27,6 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
-// gambar pohon sawit dari URL
-const palmImg = new Image();
-palmImg.src = "https://upload.wikimedia.org/wikipedia/commons/3/34/Palmeira_2.png"; 
-let palmLoaded = false;
-palmImg.onload = () => { 
-  palmLoaded = true;
-  document.getElementById("startBtn").disabled = false; // enable tombol start
-};
-
 let player = { x: 50, y: 150, size: 30, vy: 0, gravity: 1, jump: -15, grounded: true };
 let obstacles = [];
 let distance = 0;
@@ -47,8 +38,6 @@ let scores = {1: 0, 2: 0};
 let times = {1: null, 2: null};
 let gameRunning = false;
 let startTime;
-
-document.getElementById("startBtn").disabled = true; // tombol start mati dulu sampai gambar termuat
 
 function resetGame() {
   player.y = 150;
@@ -63,15 +52,14 @@ function resetGame() {
   startTime = null;
 }
 
-// buat rintangan
+// buat rintangan pohon sawit
 function generateObstacles() {
   let obs = [];
   let position = 300;
   while (position < finishLine) {
-    let type = Math.random() < 0.5 ? 1 : 2;
-    let height = type === 1 ? Math.floor(Math.random()*21)+40 : Math.floor(Math.random()*30)+60;
-    obs.push({ x: position, y: 180 - height, width: 40, height: height });
-    let gap = Math.floor(Math.random()*201)+200;
+    let height = Math.floor(Math.random()*40)+60; // tinggi batang + daun
+    obs.push({ x: position, y: 180 - height, width: 20, height: height });
+    let gap = Math.floor(Math.random()*201)+200; // jarak antar pohon
     position += gap;
   }
   return obs;
@@ -82,11 +70,21 @@ function drawPlayer() {
   ctx.fillRect(player.x, player.y, player.size, player.size); 
 }
 
-// gambar rintangan pohon sawit
+// gambar pohon sawit manual (batang + daun)
 function drawObstacles(offset) {
-  if(!palmLoaded) return; 
   obstacles.forEach(o => {
-    ctx.drawImage(palmImg, o.x - offset, o.y, o.width, o.height);
+    // batang
+    ctx.fillStyle = "sienna";
+    ctx.fillRect(o.x - offset + o.width/4, o.y + o.height*0.3, o.width/2, o.height*0.7);
+
+    // daun segitiga
+    ctx.fillStyle = "green";
+    ctx.beginPath();
+    ctx.moveTo(o.x - offset, o.y + o.height*0.3);
+    ctx.lineTo(o.x - offset + o.width, o.y + o.height*0.3);
+    ctx.lineTo(o.x - offset + o.width/2, o.y);
+    ctx.closePath();
+    ctx.fill();
   });
 }
 
