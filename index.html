@@ -48,7 +48,6 @@ function resetGame() {
   startTime = null;
 }
 
-// buat rintangan pohon sawit sederhana: batang cokelat + daun hijau kecil di atas
 function generateObstacles() {
   let obs = [];
   let pos = 300;
@@ -69,10 +68,10 @@ function drawObstacles(offset){
   obstacles.forEach(o=>{
     let x = o.x - offset;
     let y = o.y;
-    // batang
+    // batang cokelat
     ctx.fillStyle = "sienna";
     ctx.fillRect(x+5, y+o.height*0.2, 10, o.height*0.8);
-    // daun kecil di atas
+    // daun hijau kecil di atas
     ctx.fillStyle = "green";
     ctx.beginPath();
     ctx.moveTo(x+10, y+o.height*0.2);
