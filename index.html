@@ -1,27 +1,27 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Game Abang Fatih vs Abang Alab</title>
-  <style>
-    body { font-family: Arial, sans-serif; text-align: center; margin: 0; padding: 20px; background: #f0f0f0; }
-    canvas { border: 2px solid #333; display: block; margin: 20px auto; background: white; }
-    #info, #score, #winner { font-size: 18px; margin-top: 10px; }
-    button { padding: 10px 20px; font-size: 18px; margin-top: 15px; cursor: pointer; display: inline-block; }
-    #restartBtn, #nextTurnBtn { display: none; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Game Abang Fatih vs Abang Alab</title>
+<style>
+  body { font-family: Arial, sans-serif; text-align: center; margin: 0; padding: 20px; background: #f0f0f0; }
+  canvas { border: 2px solid #333; display: block; margin: 20px auto; background: white; }
+  #info, #score, #winner { font-size: 18px; margin-top: 10px; }
+  button { padding: 10px 20px; font-size: 18px; margin-top: 15px; cursor: pointer; display: inline-block; }
+  #restartBtn, #nextTurnBtn { display: none; }
+</style>
 </head>
 <body>
-  <h1>🏃 Game Abang Fatih vs Abang Alab 🏃</h1>
-  <p>Tekan <b>Spasi</b> untuk lompat.</p>
-  <button id="startBtn">Mulai Game</button>
-  <button id="nextTurnBtn">Giliran Abang Alab</button>
-  <button id="restartBtn">Main Lagi</button>
-  <canvas id="gameCanvas" width="600" height="200"></canvas>
-  <div id="info"></div>
-  <div id="score"></div>
-  <div id="winner"></div>
+<h1>🏃 Game Abang Fatih vs Abang Alab 🏃</h1>
+<p>Tekan <b>Spasi</b> untuk lompat.</p>
+<button id="startBtn">Mulai Game</button>
+<button id="nextTurnBtn">Giliran Abang Alab</button>
+<button id="restartBtn">Main Lagi</button>
+<canvas id="gameCanvas" width="600" height="200"></canvas>
+<div id="info"></div>
+<div id="score"></div>
+<div id="winner"></div>
 
 <script>
 const canvas = document.getElementById("gameCanvas");
@@ -29,9 +29,12 @@ const ctx = canvas.getContext("2d");
 
 // gambar pohon sawit dari URL
 const palmImg = new Image();
-palmImg.src = "https://upload.wikimedia.org/wikipedia/commons/3/34/Palmeira_2.png"; // gratis dan aman
+palmImg.src = "https://upload.wikimedia.org/wikipedia/commons/3/34/Palmeira_2.png"; 
 let palmLoaded = false;
-palmImg.onload = () => { palmLoaded = true; };
+palmImg.onload = () => { 
+  palmLoaded = true;
+  document.getElementById("startBtn").disabled = false; // enable tombol start
+};
 
 let player = { x: 50, y: 150, size: 30, vy: 0, gravity: 1, jump: -15, grounded: true };
 let obstacles = [];
@@ -44,6 +47,8 @@ let scores = {1: 0, 2: 0};
 let times = {1: null, 2: null};
 let gameRunning = false;
 let startTime;
+
+document.getElementById("startBtn").disabled = true; // tombol start mati dulu sampai gambar termuat
 
 function resetGame() {
   player.y = 150;
@@ -65,8 +70,8 @@ function generateObstacles() {
   while (position < finishLine) {
     let type = Math.random() < 0.5 ? 1 : 2;
     let height = type === 1 ? Math.floor(Math.random()*21)+40 : Math.floor(Math.random()*30)+60;
-    obs.push({ x: position, y: 180 - height, width: 40, height: height }); // proporsional
-    let gap = Math.floor(Math.random()*201)+200; // jarak 200-400 px
+    obs.push({ x: position, y: 180 - height, width: 40, height: height });
+    let gap = Math.floor(Math.random()*201)+200;
     position += gap;
   }
   return obs;
@@ -79,7 +84,7 @@ function drawPlayer() {
 
 // gambar rintangan pohon sawit
 function drawObstacles(offset) {
-  if(!palmLoaded) return; // tunggu gambar termuat
+  if(!palmLoaded) return; 
   obstacles.forEach(o => {
     ctx.drawImage(palmImg, o.x - offset, o.y, o.width, o.height);
   });
