@@ -27,6 +27,10 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
+// gambar pohon sawit dari URL
+const palmImg = new Image();
+palmImg.src = "https://upload.wikimedia.org/wikipedia/commons/3/34/Palmeira_2.png"; // gratis dan aman
+
 let player = { x: 50, y: 150, size: 30, vy: 0, gravity: 1, jump: -15, grounded: true };
 let obstacles = [];
 let distance = 0;
@@ -52,19 +56,17 @@ function resetGame() {
   startTime = null;
 }
 
-// 🔹 Hanya rintangan rendah & menengah, diganti pohon sawit
+// buat rintangan
 function generateObstacles() {
   let obs = [];
   let position = 300;
-
   while (position < finishLine) {
     let type = Math.random() < 0.5 ? 1 : 2;
     let height = type === 1 ? Math.floor(Math.random()*21)+20 : Math.floor(Math.random()*30)+41;
-    obs.push({ x: position, y: 180 - height, width: 20, height: height });
+    obs.push({ x: position, y: 180 - height, width: 40, height: height }); // width lebih lebar supaya proporsional
     let gap = Math.floor(Math.random()*201)+200; // jarak 200-400 px
     position += gap;
   }
-
   return obs;
 }
 
@@ -73,24 +75,10 @@ function drawPlayer() {
   ctx.fillRect(player.x, player.y, player.size, player.size); 
 }
 
-// 🔹 Rintangan pohon sawit
+// gambar rintangan pohon sawit
 function drawObstacles(offset) {
   obstacles.forEach(o => {
-    let trunkHeight = o.height * 0.7;
-    let crownHeight = o.height * 0.3;
-
-    // batang
-    ctx.fillStyle = "sienna";
-    ctx.fillRect(o.x - offset + o.width/4, o.y + crownHeight, o.width/2, trunkHeight);
-
-    // daun
-    ctx.fillStyle = "green";
-    ctx.beginPath();
-    ctx.moveTo(o.x - offset, o.y + crownHeight);
-    ctx.lineTo(o.x - offset + o.width, o.y + crownHeight);
-    ctx.lineTo(o.x - offset + o.width/2, o.y);
-    ctx.closePath();
-    ctx.fill();
+    ctx.drawImage(palmImg, o.x - offset, o.y, o.width, o.height);
   });
 }
 
