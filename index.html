@@ -51,19 +51,20 @@
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
 
-    // 🔹 Gambar-gambar
+    // 🔹 Background pemandangan alam (link aman)
+    const bgImg = new Image();
+    bgImg.src = "https://raw.githubusercontent.com/mdn/learning-area/master/html/canvas/drawimage/sky.png";
+
+    // 🔹 Pohon sawit
     const palmImg = new Image();
     palmImg.src = "https://raw.githubusercontent.com/mdn/learning-area/master/html/canvas/drawimage/palm-tree.png";
 
-    const bgImg = new Image();
-    bgImg.src = "https://i.ibb.co/LCqbJ4t/nature-background.png";
-
+    // 🔹 Karakter anak kecil
     const playerImg = new Image();
-    playerImg.src = "https://i.ibb.co/pKX7mzy/cartoon-boy.png";
+    playerImg.src = "https://raw.githubusercontent.com/mdn/learning-area/master/html/canvas/drawimage/small-boy.png";
 
-    let player = { x: 50, y: 150, size: 40, vy: 0, gravity: 1, jump: -15, grounded: true };
+    let player = { x: 50, y: 150, width: 30, height: 30, vy: 0, gravity: 1, jump: -15, grounded: true };
     let obstacles = [];
-    let score = 0;
     let distance = 0;
     let finishLine = 15000; 
     let obstacleSpeed = 3;
@@ -79,7 +80,6 @@
       player.vy = 0;
       player.grounded = true;
       obstacles = generateObstacles();
-      score = 0;
       distance = 0;
       gameOver = false;
       obstacleSpeed = 3;
@@ -88,7 +88,6 @@
       startTime = null;
     }
 
-    // 🔹 Generate obstacle berupa pohon sawit
     function generateObstacles() {
       let obs = [];
       let position = 300;
@@ -96,10 +95,14 @@
         let height = Math.floor(Math.random() * 51) + 50;
         let width = Math.floor(height * 0.6);
         obs.push({ x: position, y: 180 - height, width: width, height: height });
-        let gap = Math.floor(Math.random() * 201) + 200;
+        let gap = Math.floor(Math.random() * 201) + 200; 
         position += gap;
       }
       return obs;
+    }
+
+    function drawPlayer() {
+      ctx.drawImage(playerImg, player.x, player.y, player.width, player.height);
     }
 
     function drawObstacles(offset) {
@@ -117,10 +120,10 @@
       if (!gameRunning || gameOver) return;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      if (!startTime) startTime = Date.now();
-
-      // 🔹 Gambar background alam
+      // Draw background
       ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
+
+      if (!startTime) startTime = Date.now();
 
       // Update player
       player.y += player.vy;
@@ -133,9 +136,7 @@
 
       // Update jarak
       distance += obstacleSpeed;
-      if (distance > finishLine - 400) {
-        obstacleSpeed = 6; 
-      }
+      if (distance > finishLine - 400) obstacleSpeed = 6;
 
       // Cek finish
       if (distance >= finishLine) {
@@ -152,8 +153,8 @@
       for (let o of obstacles) {
         if (
           player.x < o.x - distance + o.width &&
-          player.x + player.size > o.x - distance &&
-          player.y + player.size > o.y
+          player.x + player.width > o.x - distance &&
+          player.y + player.height > o.y
         ) {
           gameOver = true;
           gameRunning = false;
@@ -163,10 +164,7 @@
         }
       }
 
-      // 🔹 Gambar player (anak kecil kartun)
-      ctx.drawImage(playerImg, player.x, player.y, player.size, player.size);
-
-      // 🔹 Gambar sawit & garis finish
+      drawPlayer();
       drawObstacles(distance);
       drawFinishLine(distance);
 
