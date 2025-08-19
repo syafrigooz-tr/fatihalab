@@ -52,7 +52,7 @@ function resetGame() {
   startTime = null;
 }
 
-// 🔹 Hanya rintangan rendah & menengah, tanpa tinggi
+// 🔹 Hanya rintangan rendah & menengah, diganti pohon sawit
 function generateObstacles() {
   let obs = [];
   let position = 300;
@@ -60,7 +60,6 @@ function generateObstacles() {
   while (position < finishLine) {
     let type = Math.random() < 0.5 ? 1 : 2;
     let height = type === 1 ? Math.floor(Math.random()*21)+20 : Math.floor(Math.random()*30)+41;
-
     obs.push({ x: position, y: 180 - height, width: 20, height: height });
     let gap = Math.floor(Math.random()*201)+200; // jarak 200-400 px
     position += gap;
@@ -74,11 +73,24 @@ function drawPlayer() {
   ctx.fillRect(player.x, player.y, player.size, player.size); 
 }
 
+// 🔹 Rintangan pohon sawit
 function drawObstacles(offset) {
   obstacles.forEach(o => {
-    let color = o.height <= 40 ? "green" : "orange"; // rendah & menengah
-    ctx.fillStyle = color;
-    ctx.fillRect(o.x - offset, o.y, o.width, o.height);
+    let trunkHeight = o.height * 0.7;
+    let crownHeight = o.height * 0.3;
+
+    // batang
+    ctx.fillStyle = "sienna";
+    ctx.fillRect(o.x - offset + o.width/4, o.y + crownHeight, o.width/2, trunkHeight);
+
+    // daun
+    ctx.fillStyle = "green";
+    ctx.beginPath();
+    ctx.moveTo(o.x - offset, o.y + crownHeight);
+    ctx.lineTo(o.x - offset + o.width, o.y + crownHeight);
+    ctx.lineTo(o.x - offset + o.width/2, o.y);
+    ctx.closePath();
+    ctx.fill();
   });
 }
 
