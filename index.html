@@ -51,11 +51,17 @@
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
 
-    // 🔹 Muat gambar pohon sawit dari internet (link aman untuk GitHub Pages)
+    // 🔹 Gambar-gambar
     const palmImg = new Image();
     palmImg.src = "https://raw.githubusercontent.com/mdn/learning-area/master/html/canvas/drawimage/palm-tree.png";
 
-    let player = { x: 50, y: 150, size: 30, vy: 0, gravity: 1, jump: -15, grounded: true };
+    const bgImg = new Image();
+    bgImg.src = "https://i.ibb.co/LCqbJ4t/nature-background.png";
+
+    const playerImg = new Image();
+    playerImg.src = "https://i.ibb.co/pKX7mzy/cartoon-boy.png";
+
+    let player = { x: 50, y: 150, size: 40, vy: 0, gravity: 1, jump: -15, grounded: true };
     let obstacles = [];
     let score = 0;
     let distance = 0;
@@ -87,18 +93,13 @@
       let obs = [];
       let position = 300;
       while (position < finishLine) {
-        let height = Math.floor(Math.random() * 51) + 50; // tinggi 50-100 px
-        let width = Math.floor(height * 0.6); // lebar proporsional
+        let height = Math.floor(Math.random() * 51) + 50;
+        let width = Math.floor(height * 0.6);
         obs.push({ x: position, y: 180 - height, width: width, height: height });
-        let gap = Math.floor(Math.random() * 201) + 200; 
+        let gap = Math.floor(Math.random() * 201) + 200;
         position += gap;
       }
       return obs;
-    }
-
-    function drawPlayer() {
-      ctx.fillStyle = currentPlayer === 1 ? "blue" : "green";
-      ctx.fillRect(player.x, player.y, player.size, player.size);
     }
 
     function drawObstacles(offset) {
@@ -117,6 +118,9 @@
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       if (!startTime) startTime = Date.now();
+
+      // 🔹 Gambar background alam
+      ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
 
       // Update player
       player.y += player.vy;
@@ -159,8 +163,10 @@
         }
       }
 
-      // Draw
-      drawPlayer();
+      // 🔹 Gambar player (anak kecil kartun)
+      ctx.drawImage(playerImg, player.x, player.y, player.size, player.size);
+
+      // 🔹 Gambar sawit & garis finish
       drawObstacles(distance);
       drawFinishLine(distance);
 
