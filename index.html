@@ -51,17 +51,31 @@
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
 
-    // 🔹 Background pemandangan alam (link aman)
+    // 🔹 Semua gambar
     const bgImg = new Image();
     bgImg.src = "https://raw.githubusercontent.com/mdn/learning-area/master/html/canvas/drawimage/sky.png";
 
-    // 🔹 Pohon sawit
     const palmImg = new Image();
     palmImg.src = "https://raw.githubusercontent.com/mdn/learning-area/master/html/canvas/drawimage/palm-tree.png";
 
-    // 🔹 Karakter anak kecil
     const playerImg = new Image();
     playerImg.src = "https://raw.githubusercontent.com/mdn/learning-area/master/html/canvas/drawimage/small-boy.png";
+
+    let imagesLoaded = 0;
+    const totalImages = 3;
+
+    function onImageLoad() {
+      imagesLoaded++;
+      if (imagesLoaded === totalImages) {
+        document.getElementById("startBtn").disabled = false;
+      }
+    }
+
+    bgImg.onload = onImageLoad;
+    palmImg.onload = onImageLoad;
+    playerImg.onload = onImageLoad;
+
+    document.getElementById("startBtn").disabled = true;
 
     let player = { x: 50, y: 150, width: 30, height: 30, vy: 0, gravity: 1, jump: -15, grounded: true };
     let obstacles = [];
