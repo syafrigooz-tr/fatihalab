@@ -15,7 +15,7 @@
 <body>
 <h1>🏃 Game Abang Fatih vs Abang Alab 🏃</h1>
 <p>Tekan <b>Spasi</b> untuk lompat.</p>
-<button id="startBtn" disabled>Mulai Game</button>
+<button id="startBtn">Mulai Game</button>
 <button id="nextTurnBtn">Giliran Abang Alab</button>
 <button id="restartBtn">Main Lagi</button>
 <canvas id="gameCanvas" width="600" height="200"></canvas>
@@ -39,17 +39,6 @@ let times = {1: null, 2: null};
 let gameRunning = false;
 let startTime;
 
-// Gambar kartun pohon sawit
-const palmImg = new Image();
-palmImg.src = "https://upload.wikimedia.org/wikipedia/commons/3/34/Palmeira_2.png";
-let imageReady = false;
-
-// Tunggu gambar siap
-palmImg.onload = function() {
-  imageReady = true;
-  document.getElementById("startBtn").disabled = false;
-};
-
 function resetGame() {
   player.y = 150; player.vy = 0; player.grounded = true;
   obstacles = generateObstacles();
@@ -59,11 +48,12 @@ function resetGame() {
   startTime = null;
 }
 
+// buat rintangan pohon sawit sederhana: batang cokelat + daun hijau kecil di atas
 function generateObstacles() {
   let obs = [];
   let pos = 300;
   while(pos < finishLine){
-    let h = Math.floor(Math.random()*60)+60; // tinggi 60-120 px
+    let h = Math.floor(Math.random()*60)+60;
     obs.push({x: pos, y: 180-h, width: 20, height: h});
     pos += Math.floor(Math.random()*201)+150;
   }
@@ -76,13 +66,20 @@ function drawPlayer() {
 }
 
 function drawObstacles(offset){
-  if(!imageReady) return; // jangan gambar sebelum gambar siap
   obstacles.forEach(o=>{
-    let drawWidth = o.width;
-    let drawHeight = o.height;
-    let drawX = o.x - offset;
-    let drawY = o.y;
-    ctx.drawImage(palmImg, drawX, drawY, drawWidth, drawHeight);
+    let x = o.x - offset;
+    let y = o.y;
+    // batang
+    ctx.fillStyle = "sienna";
+    ctx.fillRect(x+5, y+o.height*0.2, 10, o.height*0.8);
+    // daun kecil di atas
+    ctx.fillStyle = "green";
+    ctx.beginPath();
+    ctx.moveTo(x+10, y+o.height*0.2);
+    ctx.lineTo(x, y);
+    ctx.lineTo(x+20, y);
+    ctx.closePath();
+    ctx.fill();
   });
 }
 
@@ -114,9 +111,10 @@ function update(){
 
   // check tumbukan batang saja
   for(let o of obstacles){
-    let hitX = o.x - distance;
-    let hitWidth = o.width;
+    let hitX = o.x - distance + 5; 
     let hitY = o.y + o.height*0.2;
+    let hitWidth = 10;
+    let hitHeight = o.height*0.8;
     if(player.x + player.size > hitX && player.x < hitX + hitWidth &&
        player.y + player.size > hitY){
       gameOver=true; gameRunning=false;
