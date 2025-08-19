@@ -15,7 +15,7 @@
 <body>
 <h1>🏃 Game Abang Fatih vs Abang Alab 🏃</h1>
 <p>Tekan <b>Spasi</b> untuk lompat.</p>
-<button id="startBtn">Mulai Game</button>
+<button id="startBtn" disabled>Mulai Game</button>
 <button id="nextTurnBtn">Giliran Abang Alab</button>
 <button id="restartBtn">Main Lagi</button>
 <canvas id="gameCanvas" width="600" height="200"></canvas>
@@ -42,6 +42,11 @@ let startTime;
 // Gambar kartun pohon sawit
 const palmImg = new Image();
 palmImg.src = "https://upload.wikimedia.org/wikipedia/commons/3/34/Palmeira_2.png";
+
+// Aktifkan tombol start setelah gambar dimuat
+palmImg.onload = function() {
+  document.getElementById("startBtn").disabled = false;
+};
 
 function resetGame() {
   player.y = 150; player.vy = 0; player.grounded = true;
@@ -75,8 +80,6 @@ function drawObstacles(offset){
     let drawHeight = o.height;
     let drawX = o.x - offset;
     let drawY = o.y;
-
-    // gambar batang + daun
     ctx.drawImage(palmImg, drawX, drawY, drawWidth, drawHeight);
   });
 }
