@@ -5,19 +5,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Game Abang Fatih vs Abang Alab</title>
 <style>
-  body { font-family: Arial, sans-serif; text-align: center; margin: 0; padding: 20px; background: #f0f0f0; }
-  canvas { border: 2px solid #333; display: block; margin: 20px auto; background: white; position: relative; z-index: 0; }
-  #info, #score, #winner { font-size: 18px; margin-top: 10px; position: relative; z-index: 1; }
-  button { padding: 10px 20px; font-size: 18px; margin-top: 15px; cursor: pointer; position: relative; z-index: 2; }
-  #restartBtn, #nextTurnBtn { display: none; }
+body { font-family: Arial, sans-serif; text-align: center; margin: 0; padding: 20px; background: #f0f0f0; }
+#controls { margin-bottom: 10px; position: relative; z-index: 2; }
+button { padding: 10px 20px; font-size: 18px; margin: 5px; cursor: pointer; }
+canvas { border: 2px solid #333; display: block; margin: 20px auto; background: white; position: relative; z-index: 1; }
+#info, #score, #winner { font-size: 18px; margin-top: 10px; }
 </style>
 </head>
 <body>
 <h1>🏃 Game Abang Fatih vs Abang Alab 🏃</h1>
 <p>Tekan <b>Spasi</b> untuk lompat.</p>
-<button id="startBtn">Mulai Game</button>
-<button id="nextTurnBtn">Giliran Abang Alab</button>
-<button id="restartBtn">Main Lagi</button>
+<div id="controls">
+  <button id="startBtn">Mulai Game</button>
+  <button id="nextTurnBtn">Giliran Abang Alab</button>
+  <button id="restartBtn">Main Lagi</button>
+</div>
 <canvas id="gameCanvas" width="600" height="200"></canvas>
 <div id="info"></div>
 <div id="score"></div>
@@ -69,11 +71,9 @@ window.onload = function() {
     obstacles.forEach(o=>{
       let x = o.x - offset;
       let y = o.y;
-      // batang cokelat
-      ctx.fillStyle = "sienna";
+      ctx.fillStyle = "sienna";  // batang
       ctx.fillRect(x+5, y+o.height*0.2, 10, o.height*0.8);
-      // daun hijau kecil di atas
-      ctx.fillStyle = "green";
+      ctx.fillStyle = "green";   // daun kecil
       ctx.beginPath();
       ctx.moveTo(x+10, y+o.height*0.2);
       ctx.lineTo(x, y);
