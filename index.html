@@ -52,24 +52,14 @@ function resetGame() {
   startTime = null;
 }
 
-// 🔹 Fungsi generateObstacles terbaru
+// 🔹 Hanya rintangan rendah & menengah, tanpa tinggi
 function generateObstacles() {
   let obs = [];
   let position = 300;
 
   while (position < finishLine) {
-    let height;
-    if (position < finishLine * 2 / 3) {
-      // 2/3 awal → rintangan rendah & menengah saja
-      let type = Math.random() < 0.5 ? 1 : 2;
-      height = type === 1 ? Math.floor(Math.random()*21)+20 : Math.floor(Math.random()*30)+41;
-    } else {
-      // 1/3 akhir → rintangan rendah, menengah, atau tinggi
-      let rand = Math.random();
-      if (rand < 0.33) height = Math.floor(Math.random()*21)+20;
-      else if (rand < 0.66) height = Math.floor(Math.random()*30)+41;
-      else height = Math.floor(Math.random()*30)+71;
-    }
+    let type = Math.random() < 0.5 ? 1 : 2;
+    let height = type === 1 ? Math.floor(Math.random()*21)+20 : Math.floor(Math.random()*30)+41;
 
     obs.push({ x: position, y: 180 - height, width: 20, height: height });
     let gap = Math.floor(Math.random()*201)+200; // jarak 200-400 px
@@ -86,10 +76,7 @@ function drawPlayer() {
 
 function drawObstacles(offset) {
   obstacles.forEach(o => {
-    let color;
-    if (o.height <= 40) color = "green";       // rendah
-    else if (o.height <= 70) color = "orange"; // menengah
-    else color = "red";                         // tinggi
+    let color = o.height <= 40 ? "green" : "orange"; // rendah & menengah
     ctx.fillStyle = color;
     ctx.fillRect(o.x - offset, o.y, o.width, o.height);
   });
