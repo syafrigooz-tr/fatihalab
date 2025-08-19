@@ -39,6 +39,10 @@ let times = {1: null, 2: null};
 let gameRunning = false;
 let startTime;
 
+// Gambar kartun pohon sawit
+const palmImg = new Image();
+palmImg.src = "https://upload.wikimedia.org/wikipedia/commons/3/34/Palmeira_2.png";
+
 function resetGame() {
   player.y = 150; player.vy = 0; player.grounded = true;
   obstacles = generateObstacles();
@@ -54,7 +58,7 @@ function generateObstacles() {
   let pos = 300;
   while(pos < finishLine){
     let h = Math.floor(Math.random()*60)+60; // tinggi 60-120 px
-    obs.push({x: pos, y: 180-h, width: 20, height: h});
+    obs.push({x: pos, y: 180-h, width: 30, height: h});
     pos += Math.floor(Math.random()*201)+150;
   }
   return obs;
@@ -65,24 +69,9 @@ function drawPlayer() {
   ctx.fillRect(player.x, player.y, player.size, player.size);
 }
 
-// Gambar pohon sawit: batang cokelat + daun hijau melengkung
 function drawObstacles(offset){
   obstacles.forEach(o=>{
-    // batang
-    ctx.fillStyle = "sienna";
-    ctx.fillRect(o.x-offset + o.width/3, o.y + o.height/2, o.width/3, o.height/2);
-    
-    // daun
-    ctx.fillStyle = "green";
-    for(let i=-2;i<=2;i++){
-      ctx.beginPath();
-      ctx.moveTo(o.x-offset + o.width/2, o.y + o.height/2);
-      ctx.quadraticCurveTo(o.x-offset + o.width/2 + i*10, o.y, o.x-offset + o.width/2 + i*20, o.y + 10);
-      ctx.strokeStyle="green";
-      ctx.lineWidth=3;
-      ctx.stroke();
-      ctx.closePath();
-    }
+    ctx.drawImage(palmImg, o.x-offset, o.y, o.width, o.height);
   });
 }
 
