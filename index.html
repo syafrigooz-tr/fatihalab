@@ -71,13 +71,15 @@ window.onload = function() {
     obstacles.forEach(o=>{
       let x = o.x - offset;
       let y = o.y;
-      ctx.fillStyle = "sienna";  // batang
+      // batang sawit
+      ctx.fillStyle = "sienna";
       ctx.fillRect(x+5, y+o.height*0.2, 10, o.height*0.8);
-      ctx.fillStyle = "green";   // daun kecil
+      // daun hanya melebar ke bawah
+      ctx.fillStyle = "green";
       ctx.beginPath();
       ctx.moveTo(x+10, y+o.height*0.2);
-      ctx.lineTo(x, y);
-      ctx.lineTo(x+20, y);
+      ctx.lineTo(x, y+o.height*0.5);
+      ctx.lineTo(x+20, y+o.height*0.5);
       ctx.closePath();
       ctx.fill();
     });
