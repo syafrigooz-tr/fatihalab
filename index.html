@@ -19,14 +19,22 @@
     margin-top: 10px;
   }
   #restartBtn, #nextTurnBtn { display: none; }
-  #preGameImg, #winnerImg { display:block; margin: 20px auto; max-width: 300px; }
-  #winnerText { font-size: 28px; font-weight: bold; color: red; margin-top: 10px; }
+  #preGameContainer { display:flex; justify-content:center; align-items:center; margin-bottom: 10px; }
+  #preGameContainer img { max-width:120px; margin:0 10px; }
+  #winnerContainer { display:none; opacity:0; transition: opacity 1s ease-in-out; margin-top:10px; }
+  #winnerContainer.show { opacity:1; display:block; }
+  #winnerImg { max-width:200px; display:block; margin:10px auto; }
+  #winnerText { font-size:28px; font-weight:bold; color:red; margin-top:10px; }
 </style>
 </head>
 <body>
 
-<!-- Gambar awal sebelum judul -->
-<img id="preGameImg" src="Gambar1a.png" alt="Abang Fatih vs Abang Alab">
+<!-- Gambar awal kedua karakter berdampingan -->
+<div id="preGameContainer">
+  <img src="Gambar1a.png" alt="Abang Fatih">
+  <img src="Gambar2a.png" alt="Abang Alab">
+</div>
+
 <h1>🏃 Game Abang Fatih vs Abang Alab 🏃</h1>
 <p>Tekan <b>Spasi</b> atau tombol <b>Lompat</b> untuk lompat.</p>
 
@@ -40,7 +48,7 @@
 <button id="jumpBtn">Lompat</button>
 
 <!-- Area untuk gambar pemenang -->
-<div id="winnerContainer" style="display:none;">
+<div id="winnerContainer">
   <div id="winnerText">WINNER</div>
   <img id="winnerImg" src="" alt="Pemenang">
 </div>
@@ -71,7 +79,7 @@ function resetGame(){
   obstacles = generateObstacles();
   distance=0; gameOver=false; obstacleSpeed=3;
   document.getElementById("score").textContent = "Jarak: 0 / " + finishLine;
-  document.getElementById("winnerContainer").style.display = "none";
+  document.getElementById("winnerContainer").classList.remove("show");
   startTime = null;
 }
 
@@ -155,8 +163,10 @@ function nextTurn(finished){
     }
 
     if(winnerImg !== ""){
+      const winnerContainer = document.getElementById("winnerContainer");
       document.getElementById("winnerImg").src = winnerImg;
-      document.getElementById("winnerContainer").style.display = "block";
+      winnerContainer.classList.remove("show"); // reset
+      setTimeout(()=>{ winnerContainer.classList.add("show"); },50); // fade-in
     }
 
     let winnerText="";
