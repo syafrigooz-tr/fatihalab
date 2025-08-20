@@ -51,7 +51,13 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
-let player = { x: 50, y: 150, size: 30, vy: 0, gravity: 1, jump: -15, grounded: true };
+// Load gambar pemain
+const imgFatih = new Image();
+imgFatih.src = "Gambar1.png";
+const imgAlab = new Image();
+imgAlab.src = "Gambar2.png";
+
+let player = { x: 50, y: 150, size: 40, vy: 0, gravity: 1, jump: -15, grounded: true };
 let obstacles = [];
 let distance = 0;
 let finishLine = 15000;
@@ -83,8 +89,8 @@ function generateObstacles(){
 }
 
 function drawPlayer(){
-  ctx.fillStyle = currentPlayer===1?"blue":"green";
-  ctx.fillRect(player.x,player.y,player.size,player.size);
+  let img = currentPlayer===1 ? imgFatih : imgAlab;
+  ctx.drawImage(img, player.x, player.y, player.size, player.size);
 }
 
 function drawObstacles(offset){
@@ -197,4 +203,3 @@ document.getElementById("restartBtn").addEventListener("click", ()=>{
 </script>
 </body>
 </html>
-
