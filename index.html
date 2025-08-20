@@ -84,17 +84,54 @@ function resetGame(){
   startTime = null;
 }
 
-// 🔹 Rintangan lebih kecil & lebih jarang
+// 🔹 Gambar rintangan (pohon sawit kecil)
+function drawSawit(x, y) {
+  // batang
+  ctx.fillStyle = "#8B4513"; 
+  ctx.fillRect(x + 15, y - 100, 20, 100); // batang 100px
+
+  // daun atas
+  ctx.beginPath();
+  ctx.fillStyle = "green";
+  ctx.moveTo(x - 20, y - 100);
+  ctx.lineTo(x + 25, y - 150);
+  ctx.lineTo(x + 70, y - 100);
+  ctx.fill();
+
+  // daun tengah
+  ctx.beginPath();
+  ctx.moveTo(x - 10, y - 80);
+  ctx.lineTo(x + 25, y - 130);
+  ctx.lineTo(x + 60, y - 80);
+  ctx.fill();
+}
+
+// 🔹 Generate posisi rintangan
 function generateObstacles(){
   let obs=[]; 
   let pos=300;
   while(pos<finishLine){
-    let height = Math.floor(Math.random()*21)+10; // tinggi 10–30 px
-    let width = Math.floor(Math.random()*11)+10;  // lebar 10–20 px
-    obs.push({x:pos,y:180-height,width:width,height:height});
-    pos += Math.floor(Math.random()*201)+250; // jarak antar rintangan lebih longgar
+    obs.push({x:pos,y:canvas.height}); // pohon di tanah
+    pos += Math.floor(Math.random()*201)+250; 
   }
   return obs;
+}
+
+// 🔹 Gambar semua rintangan
+function drawObstacles(offset){
+  obstacles.forEach(o => drawSawit(o.x - offset, o.y));
+}
+
+// 🔹 Deteksi tabrakan dengan batang sawit saja
+function checkCollision(o){
+  let ox = o.x - distance + 15;  // posisi batang
+  let oy = o.y - 100;           // atas batang
+  let ow = 20;                  // lebar batang
+  let oh = 100;                 // tinggi batang
+
+  return (player.x < ox + ow &&
+          player.x + player.size > ox &&
+          player.y + player.size > oy);
 }
 
 function drawPlayer(){
@@ -107,11 +144,6 @@ function drawPlayer(){
     ctx.fillStyle = currentPlayer===1 ? "blue" : "green";
     ctx.fillRect(player.x, player.y, player.size, player.size);
   }
-}
-
-function drawObstacles(offset){
-  ctx.fillStyle="red";
-  obstacles.forEach(o=> ctx.fillRect(o.x-offset,o.y,o.width,o.height));
 }
 
 function drawFinishLine(offset){
@@ -141,7 +173,7 @@ function update(){
   }
 
   for(let o of obstacles){
-    if(player.x < o.x-distance+o.width && player.x+player.size > o.x-distance && player.y+player.size > o.y){
+    if(checkCollision(o)){
       gameOver=true; gameRunning=false;
       scores[currentPlayer]=distance;
       nextTurn(false);
