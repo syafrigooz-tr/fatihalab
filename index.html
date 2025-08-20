@@ -84,12 +84,15 @@ function resetGame(){
   startTime = null;
 }
 
+// 🔹 Rintangan lebih kecil & lebih jarang
 function generateObstacles(){
-  let obs=[]; let pos=300;
+  let obs=[]; 
+  let pos=300;
   while(pos<finishLine){
-    let height = Math.floor(Math.random()*51)+20;
-    obs.push({x:pos,y:180-height,width:20,height:height});
-    pos += Math.floor(Math.random()*201)+200;
+    let height = Math.floor(Math.random()*21)+10; // tinggi 10–30 px
+    let width = Math.floor(Math.random()*11)+10;  // lebar 10–20 px
+    obs.push({x:pos,y:180-height,width:width,height:height});
+    pos += Math.floor(Math.random()*201)+250; // jarak antar rintangan lebih longgar
   }
   return obs;
 }
