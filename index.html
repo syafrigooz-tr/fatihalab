@@ -19,21 +19,17 @@
     margin-top: 10px;
   }
   #restartBtn, #nextTurnBtn { display: none; }
-  #preGameContainer { display:flex; justify-content:center; align-items:center; margin-bottom: 10px; }
-  #preGameContainer img { max-width:120px; margin:0 10px; }
-  #winnerContainer { display:none; opacity:0; transition: opacity 1s ease-in-out; margin-top:10px; }
-  #winnerContainer.show { opacity:1; display:block; }
-  #winnerImg { max-width:200px; display:block; margin:10px auto; }
-  #winnerText { font-size:28px; font-weight:bold; color:red; margin-top:10px; }
+  .logo {
+    max-width: 200px;
+    display: block;
+    margin: 0 auto 10px auto;
+  }
 </style>
 </head>
 <body>
 
-<!-- Gambar awal kedua karakter berdampingan -->
-<div id="preGameContainer">
-  <img src="Gambar1a.png" alt="Abang Fatih">
-  <img src="Gambar2a.png" alt="Abang Alab">
-</div>
+<!-- Gambar di atas judul -->
+<img src="Gambar1aa.png" alt="Logo Game" class="logo">
 
 <h1>🏃 Game Abang Fatih vs Abang Alab 🏃</h1>
 <p>Tekan <b>Spasi</b> atau tombol <b>Lompat</b> untuk lompat.</p>
@@ -45,24 +41,17 @@
 <canvas id="gameCanvas" width="600" height="200"></canvas>
 <div id="info"></div>
 <div id="score"></div>
+
+<!-- Tombol lompat berada di bawah skor -->
 <button id="jumpBtn">Lompat</button>
 
-<!-- Area untuk gambar pemenang -->
-<div id="winnerContainer">
-  <div id="winnerText">WINNER</div>
-  <img id="winnerImg" src="" alt="Pemenang">
-</div>
+<div id="winner"></div>
 
 <script>
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
-// Gambar pemain untuk canvas
-const playerImages = [new Image(), new Image()];
-playerImages[0].src = 'Gambar1.png'; // Abang Fatih
-playerImages[1].src = 'Gambar2.png'; // Abang Alab
-
-let player = { x: 50, y: 150, size: 50, vy: 0, gravity: 1, jump: -15, grounded: true };
+let player = { x: 50, y: 150, size: 30, vy: 0, gravity: 1, jump: -15, grounded: true };
 let obstacles = [];
 let distance = 0;
 let finishLine = 15000;
@@ -79,7 +68,7 @@ function resetGame(){
   obstacles = generateObstacles();
   distance=0; gameOver=false; obstacleSpeed=3;
   document.getElementById("score").textContent = "Jarak: 0 / " + finishLine;
-  document.getElementById("winnerContainer").classList.remove("show");
+  document.getElementById("winner").textContent = "";
   startTime = null;
 }
 
@@ -94,8 +83,8 @@ function generateObstacles(){
 }
 
 function drawPlayer(){
-  const img = playerImages[currentPlayer-1];
-  ctx.drawImage(img, player.x, player.y, player.size, player.size);
+  ctx.fillStyle = currentPlayer===1?"blue":"green";
+  ctx.fillRect(player.x,player.y,player.size,player.size);
 }
 
 function drawObstacles(offset){
@@ -152,29 +141,14 @@ function nextTurn(finished){
     document.getElementById("info").innerHTML="✅ Giliran Abang Fatih selesai! "+(finished?"(Finish dalam "+times[1]+" dtk)":"(Jarak: "+scores[1]+")");
     document.getElementById("nextTurnBtn").style.display="inline-block";
   } else {
-    // Tentukan pemenang
-    let winnerImg = "";
-    if(scores[1]>scores[2]){
-      winnerImg = "Gambar1.png"; // Abang Fatih menang
-    } else if(scores[2]>scores[1]){
-      winnerImg = "Gambar2.png"; // Abang Alab menang
-    } else {
-      winnerImg = ""; // seri
-    }
-
-    if(winnerImg !== ""){
-      const winnerContainer = document.getElementById("winnerContainer");
-      document.getElementById("winnerImg").src = winnerImg;
-      winnerContainer.classList.remove("show"); // reset
-      setTimeout(()=>{ winnerContainer.classList.add("show"); },50); // fade-in
-    }
-
     let winnerText="";
-    if(scores[1]>scores[2]) winnerText="🎉 Pemenang: Abang Fatih!";
+    if(scores[1]>=finishLine && scores[2]>=finishLine){
+      winnerText = times[1]<times[2]?"🎉 Pemenang: Abang Fatih (lebih cepat)!":
+                   times[2]<times[1]?"🎉 Pemenang: Abang Alab (lebih cepat)!":"🤝 Seri! Waktu sama.";
+    } else if(scores[1]>scores[2]) winnerText="🎉 Pemenang: Abang Fatih!";
     else if(scores[2]>scores[1]) winnerText="🎉 Pemenang: Abang Alab!";
     else winnerText="🤝 Seri! Jarak sama.";
     document.getElementById("winner").textContent=winnerText;
-
     document.getElementById("info").innerHTML=`Hasil 👉 Fatih: ${scores[1]} (${times[1]?times[1]+" dtk":"belum finish"}) | Alab: ${scores[2]} (${times[2]?times[2]+" dtk":"belum finish"})`;
     document.getElementById("restartBtn").style.display="inline-block";
   }
@@ -187,6 +161,7 @@ function startTurn(){
   update();
 }
 
+// Tombol lompat
 document.getElementById("jumpBtn").addEventListener("click", ()=>{
   if(player.grounded && gameRunning){
     player.vy = player.jump;
